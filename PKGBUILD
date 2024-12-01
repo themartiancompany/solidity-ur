@@ -8,6 +8,9 @@
 
 # shellcheck disable=SC2034
 # shellcheck disable=SC2154
+_os="$( \
+  uname \
+    -o)"
 _pkg="solidity"
 pkgname="${_pkg}"
 pkgver="0.8.28"
@@ -41,6 +44,11 @@ makedepends=(
   "boost"
   "cmake"
 )
+if [[ "${_os}" == "Android" ]]; then
+  makedepends+=(
+    "boost-headers"
+  )
+fi
 checkdepends=(
   "evmone"
 )
