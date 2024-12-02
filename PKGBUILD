@@ -47,6 +47,7 @@ makedepends=(
 if [[ "${_os}" == "Android" ]]; then
   makedepends+=(
     "boost-headers"
+    "boost-static"
   )
 fi
 checkdepends=(
