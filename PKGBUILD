@@ -59,6 +59,26 @@ sha512sums=(
   '2ddce3edfc1d570fb42d19d3164f5f7316d511bd3020c711b8176410b39432b7e137806bc63e23bb6c7381ab880c7e7e667217ab4cd8d92a6ad7e2ab145a194f'
 )
 
+_bin_get() {
+  local \
+    _cc \
+    _bin
+  _cc="$( \
+    command \
+      -v \
+      "cc" \
+      "g++" \
+      "clang++" | \
+      head \
+        -n \
+          1)"
+  _bin="$( \
+    dirname \
+      "${_cc}")"
+  echo \
+    "${_bin}"
+}
+
 _compile() {
   local \
     _tests="${1}" \
@@ -128,6 +148,11 @@ package()
   cmake \
     --install \
       "${srcdir}/${pkgname}_${pkgver}/build/"
+  # Set version link
+  ln \
+    -s \
+    "$(_bin_get)/solc" \
+    "$(_bin_get)/solc${pkgver}"
   # Install the documentation.
   install \
     -Dm644 \
