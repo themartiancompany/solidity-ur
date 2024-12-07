@@ -48,7 +48,7 @@ provides=(
   "solc=${pkgver}"
 )
 conflicts=(
-  "solc"
+  "solc=${pkgver}"
   "solidity-bin"
   "solidity-git"
 )
