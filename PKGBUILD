@@ -18,6 +18,7 @@
 #
 #    You should have received a copy of the GNU Affero General Public License
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
 # Maintainers:
 #   Truocolo
 #     <truocolo@aol.com>
@@ -64,6 +65,7 @@ pkgname+=(
   "${_pkg}"
 )
 pkgver="0.8.30"
+_commit="73712a01b2de56d9ad91e3b6936f85c90cb7de36"
 pkgrel="1"
 pkgdesc="Smart contract programming language."
 arch=(
@@ -115,7 +117,7 @@ conflicts=(
   "solidity-git"
 )
 _sha512_sum="b08733619a4c1398a2b80d0fec83d56b3769af8dfa01a028c71ff89985f5c93d12c3c7d8bbcec29bb0816a9cc1d56bb099010e59a203bcf917b87ff1b0cf0241"
-if [[ "${_evmfs}" == "false" ]]; then
+if [[ "${_evmfs}" == "true" ]]; then
   _uri=""
 elif [[ "${_evmfs}" == "false" ]]; then
   if [[ "${_git}" == "false" ]]; then
