@@ -108,7 +108,7 @@ conflicts=(
   "solidity-bin"
   "solidity-git"
 )
-_sha512_sum='2ddce3edfc1d570fb42d19d3164f5f7316d511bd3020c711b8176410b39432b7e137806bc63e23bb6c7381ab880c7e7e667217ab4cd8d92a6ad7e2ab145a194f'
+_sha512_sum="b08733619a4c1398a2b80d0fec83d56b3769af8dfa01a028c71ff89985f5c93d12c3c7d8bbcec29bb0816a9cc1d56bb099010e59a203bcf917b87ff1b0cf0241"
 if [[ "${_evmfs}" == "false" ]]; then
   if [[ "${_git}" == "false" ]]; then
     _uri="${url}/releases/download/v${pkgver}/${pkgname}_${pkgver}.tar.gz"
