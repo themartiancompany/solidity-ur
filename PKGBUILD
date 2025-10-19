@@ -1,19 +1,61 @@
 # SPDX-License-Identifier: AGPL-3.0
+
+#    ----------------------------------------------------------------------
+#    Copyright © 2024, 2025  Pellegrino Prevete
 #
-# Maintainer: Truocolo <truocolo@aol.com>
-# Maintainer: Pellegrino Prevete (tallero) <pellegrinoprevete@gmail.com>
-# Contributor: Matheus <matheusgwdl@protonmail.com>
-# Contributor: Serge K <arch@phnx47.net>
-# Contributor: Nicola Squartini <tensor5@gmail.com>
+#    All rights reserved
+#    ----------------------------------------------------------------------
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU Affero General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU Affero General Public License for more details.
+#
+#    You should have received a copy of the GNU Affero General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+# Maintainers:
+#   Truocolo
+#     <truocolo@aol.com>
+#     <truocolo@0x6E5163fC4BFc1511Dbe06bB605cc14a3e462332b>
+#   Pellegrino Prevete (dvorak)
+#     <pellegrinoprevete@gmail.com>
+#     <dvorak@0x87003Bd6C074C713783df04f36517451fF34CBEf>
+# Contributors:
+#   Matheus
+#     <matheusgwdl@protonmail.com>
+#   Serge K
+#     <arch@phnx47.net>
+#   Nicola Squartini
+#     <tensor5@gmail.com>
 
 # shellcheck disable=SC2034
 # shellcheck disable=SC2154
 _os="$( \
   uname \
     -o)"
-_pkg="solidity"
-pkgname="${_pkg}"
-pkgver="0.8.28"
+_evmfs_available="$( \
+  command \
+    -v \
+    "evmfs" || \
+    true)"
+if [[ ! -v "_evmfs" ]]; then
+  if [[ "${_evmfs_available}" != "" ]]; then
+    _evmfs="true"
+  elif [[ "${_evmfs_available}" == "" ]]; then
+    _evmfs="false"
+  fi
+fi
+_pkg=solidity
+pkgbase="${_pkg}"
+pkgname+=(
+  "${_pkg}"
+)
+pkgver="0.8.30"
 pkgrel="1"
 pkgdesc="Smart contract programming language."
 arch=(
@@ -55,17 +97,27 @@ checkdepends=(
 )
 provides=(
   "solc=${pkgver}"
+  "solidity-bin=${pkgver}"
+  "solidity-git=${pkgver}"
 )
 conflicts=(
-  "solc=${pkgver}"
+  "solc"
   "solidity-bin"
   "solidity-git"
 )
+_sha512_sum='2ddce3edfc1d570fb42d19d3164f5f7316d511bd3020c711b8176410b39432b7e137806bc63e23bb6c7381ab880c7e7e667217ab4cd8d92a6ad7e2ab145a194f'
+if [[ "${_evmfs}" == "false" ]]; then
+  if [[ "${_git}" == "false" ]]; then
+    _uri="${pkgname}-v${pkgver}.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}_${pkgver}.tar.gz"
+  fi
+fi
+_src="${pkgname}-v${pkgver}.tar.gz::${_uri}"
 source=(
+  "${_src}"
   "${pkgname}-v${pkgver}.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}_${pkgver}.tar.gz"
 )
 sha512sums=(
-  '2ddce3edfc1d570fb42d19d3164f5f7316d511bd3020c711b8176410b39432b7e137806bc63e23bb6c7381ab880c7e7e667217ab4cd8d92a6ad7e2ab145a194f'
+  "${_sha512_sum}"
 )
 
 _bin_get() {
@@ -146,8 +198,12 @@ check()
     "OFF"
 }
 
-package()
-{
+package_solidity() {
+  conflicts=(
+    "solc"
+    "solidity-bin"
+    "solidity-git"
+  )
   # Assure that the directories exist.
   mkdir \
     -p \
