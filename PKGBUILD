@@ -53,6 +53,11 @@ fi
 if [[ ! -v "_git" ]]; then
   _git="false"
 fi
+if [[ "${_os}" == "Android" ]]; then
+  _compiler="clang"
+elif [[ "${_os}" == "GNU/Linux" ]]; then
+  _compiler="gcc"
+fi
 _pkg=solidity
 pkgbase="${_pkg}"
 pkgname+=(
@@ -88,6 +93,7 @@ optdepends=(
 makedepends=(
   "boost"
   "cmake"
+  "${_compiler}"
 )
 if [[ "${_os}" == "Android" ]]; then
   makedepends+=(
@@ -147,7 +153,23 @@ _bin_get() {
 _compile() {
   local \
     _tests="${1}" \
-    _cmake_opts=()
+    _cmake_opts=() \
+    _cc \
+    _cxx \
+    _cxx_compiler
+  _cc="$( \
+    command \
+      -v \
+      "${_compiler}")"
+  if [[ "${_compiler}" == "gcc" ]]; then
+    _cxx_compiler="g++"
+  elif [[ "${_compiler}" == "clang" ]]; then
+   _cxx_compiler="${_compiler}++"
+  fi
+  _cxx="$( \
+    command \
+      -v \
+      "${_cxx_compiler}")"
   _cmake_opts=(
     -D CMAKE_BUILD_TYPE="None"
     -D CMAKE_INSTALL_PREFIX="/usr/"
@@ -164,10 +186,17 @@ _compile() {
     -S "${srcdir}/${pkgname}_${pkgver}/"
     -Wno-dev
   )
+  export \
+    CC="${_cc}" \
+    CXX="${_cxx}"
+  CC="${_cc}" \
+  CXX="${_cxx}" \
   cmake \
     -B \
       "${srcdir}/${pkgname}_${pkgver}/build/" \
     "${_cmake_opts[@]}"
+  CC="${_cc}" \
+  CXX="${_cxx}" \
   cmake \
     --build \
       "${srcdir}/${pkgname}_${pkgver}/build/"
