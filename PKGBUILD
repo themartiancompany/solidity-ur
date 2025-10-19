@@ -111,13 +111,12 @@ conflicts=(
 _sha512_sum='2ddce3edfc1d570fb42d19d3164f5f7316d511bd3020c711b8176410b39432b7e137806bc63e23bb6c7381ab880c7e7e667217ab4cd8d92a6ad7e2ab145a194f'
 if [[ "${_evmfs}" == "false" ]]; then
   if [[ "${_git}" == "false" ]]; then
-    _uri="${pkgname}-v${pkgver}.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}_${pkgver}.tar.gz"
+    _uri="::${url}/releases/download/v${pkgver}/${pkgname}_${pkgver}.tar.gz"
   fi
 fi
 _src="${pkgname}-v${pkgver}.tar.gz::${_uri}"
 source=(
   "${_src}"
-  "${pkgname}-v${pkgver}.tar.gz::${url}/releases/download/v${pkgver}/${pkgname}_${pkgver}.tar.gz"
 )
 sha512sums=(
   "${_sha512_sum}"
