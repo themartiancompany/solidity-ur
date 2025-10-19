@@ -252,7 +252,7 @@ package_solidity() {
   ln \
     -s \
     "$(_bin_get)/solc" \
-    "$(_bin_get)/solc${pkgver}"
+    "${pkgdir}/usr/bin/solc${pkgver}"
   # Install the documentation.
   install \
     -Dm644 \
