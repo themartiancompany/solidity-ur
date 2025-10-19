@@ -50,6 +50,9 @@ if [[ ! -v "_evmfs" ]]; then
     _evmfs="false"
   fi
 fi
+if [[ ! -v "_git" ]]; then
+  _git="false"
+fi
 _pkg=solidity
 pkgbase="${_pkg}"
 pkgname+=(
