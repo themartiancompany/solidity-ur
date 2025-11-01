@@ -66,6 +66,7 @@ pkgname+=(
 )
 pkgver="0.8.30"
 _commit="73712a01b2de56d9ad91e3b6936f85c90cb7de36"
+_bundle_commit="142aa62e6805505b6a06cbeeec530f5c8bf0bfdd"
 pkgrel="1"
 pkgdesc="Smart contract programming language."
 arch=(
@@ -116,6 +117,8 @@ conflicts=(
   "solidity-bin"
   "solidity-git"
 )
+_sum="77860b58f9d6c4a9a9cb1ceaae7ebe5d856f91f3ccd96f67d5ea6a019d79d1fb"
+_sig_sum="7f737e7a88fdb8e96b428974592def4bbdf5bf24656b12ac5af76084b7fca095"
 _sha512_sum="b08733619a4c1398a2b80d0fec83d56b3769af8dfa01a028c71ff89985f5c93d12c3c7d8bbcec29bb0816a9cc1d56bb099010e59a203bcf917b87ff1b0cf0241"
 if [[ "${_evmfs}" == "true" ]]; then
   _uri=""
