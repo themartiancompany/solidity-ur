@@ -36,10 +36,10 @@
 
 # shellcheck disable=SC2034
 # shellcheck disable=SC2154
-_os="$( \
+_os="$(
   uname \
     -o)"
-_evmfs_available="$( \
+_evmfs_available="$(
   command \
     -v \
     "evmfs" || \
@@ -54,6 +54,9 @@ fi
 if [[ ! -v "_git" ]]; then
   _git="false"
 fi
+if [[ ! -v "_git_service" ]]; then
+  _git_service="github"
+fi
 if [[ "${_os}" == "Android" ]]; then
   _compiler="clang"
 elif [[ "${_os}" == "GNU/Linux" ]]; then
@@ -67,7 +70,7 @@ pkgname+=(
 pkgver="0.8.30"
 _commit="73712a01b2de56d9ad91e3b6936f85c90cb7de36"
 _bundle_commit="142aa62e6805505b6a06cbeeec530f5c8bf0bfdd"
-pkgrel="2"
+pkgrel="3"
 pkgdesc="Smart contract programming language."
 arch=(
   "x86_64"
@@ -107,15 +110,19 @@ fi
 checkdepends=(
   "evmone"
 )
+group=(
+  "ethereum"
+  "hip"
+)
 provides=(
   "solc=${pkgver}"
-  "solidity-bin=${pkgver}"
-  "solidity-git=${pkgver}"
+  "${_pkg}-bin=${pkgver}"
+  "${_pkg}-git=${pkgver}"
 )
 conflicts=(
   "solc"
-  "solidity-bin"
-  "solidity-git"
+  "${_pkg}-bin"
+  "${_pkg}-git"
 )
 _sum="77860b58f9d6c4a9a9cb1ceaae7ebe5d856f91f3ccd96f67d5ea6a019d79d1fb"
 _sig_sum="7f737e7a88fdb8e96b428974592def4bbdf5bf24656b12ac5af76084b7fca095"
@@ -176,19 +183,34 @@ _compile() {
       -v \
       "${_cxx_compiler}")"
   _cmake_opts=(
-    -D CMAKE_BUILD_TYPE="None"
-    -D CMAKE_INSTALL_PREFIX="/usr/"
-    -D ONLY_BUILD_SOLIDITY_LIBRARIES="OFF"
-    -D PEDANTIC="ON"
-    -D PROFILE_OPTIMIZER_STEPS="OFF"
-    -D SOLC_LINK_STATIC="OFF"
-    -D SOLC_STATIC_STDLIBS="OFF"
-    -D STRICT_NLOHMANN_JSON_VERSION="OFF"
-    -D STRICT_Z3_VERSION="OFF"
-    -D TESTS="${_tests}"
-    -D USE_LD_GOLD="OFF"
-    -D USE_SYSTEM_LIBRARIES="OFF"
-    -S "${srcdir}/${pkgname}_${pkgver}/"
+    -G
+      "Ninja"
+    -D
+      CMAKE_BUILD_TYPE="None"
+    -D
+      CMAKE_INSTALL_PREFIX="/usr/"
+    -D
+      ONLY_BUILD_SOLIDITY_LIBRARIES="OFF"
+    -D
+      PEDANTIC="ON"
+    -D
+      PROFILE_OPTIMIZER_STEPS="OFF"
+    -D
+      SOLC_LINK_STATIC="OFF"
+    -D
+      SOLC_STATIC_STDLIBS="OFF"
+    -D
+      STRICT_NLOHMANN_JSON_VERSION="OFF"
+    -D
+      STRICT_Z3_VERSION="OFF"
+    -D
+      TESTS="${_tests}"
+    -D
+      USE_LD_GOLD="OFF"
+    -D
+      USE_SYSTEM_LIBRARIES="OFF"
+    -S
+      "${srcdir}/${pkgname}_${pkgver}/"
     -Wno-dev
   )
   export \
