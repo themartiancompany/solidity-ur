@@ -158,8 +158,10 @@ elif [[ "${_git}" == "true" ]]; then
   _tag_name="commit"
   _tarname="${pkgname}-${_tag}"
 fi
+_tarfile="${_tarname}.${_archive_format}"
 _bundle_sum="77860b58f9d6c4a9a9cb1ceaae7ebe5d856f91f3ccd96f67d5ea6a019d79d1fb"
 _bundle_sig_sum="7f737e7a88fdb8e96b428974592def4bbdf5bf24656b12ac5af76084b7fca095"
+_github_release_sum="5e8d58dff551a18205e325c22f1a3b194058efbdc128853afd75d31b0568216d"
 _github_release_sha512_sum="b08733619a4c1398a2b80d0fec83d56b3769af8dfa01a028c71ff89985f5c93d12c3c7d8bbcec29bb0816a9cc1d56bb099010e59a203bcf917b87ff1b0cf0241"
 # Dvorak
 _evmfs_ns="0x87003Bd6C074C713783df04f36517451fF34CBEf"
@@ -185,13 +187,13 @@ elif [[ "${_evmfs}" == "false" ]]; then
     _src="${_tarname}::git+${_url}#${_tag_name}=${_tag}?signed"
     _sum="SKIP"
   elif [[ "${_git}" == false ]]; then
-    _uri=""
     if [[ "${_git_service}" == "github" ]]; then
       if [[ "${_tag_name}" == "commit" ]]; then
         _uri="${_url}/archive/${_commit}.${_archive_format}"
         _sum="SKIP"
       elif [[ "${_tag_name}" == "pkgver" ]]; then
         _uri="${url}/releases/download/v${pkgver}/${pkgname}_${pkgver}.tar.gz"
+	_sum="${_github_release_sum}"
         sha512sums=(
           "${_github_release_sha512_sum}"
         )
