@@ -175,11 +175,12 @@ _sig_src="${_tarfile}.sig::${_sig_uri}"
 if [[ "${_evmfs}" == "true" ]]; then
   if [[ "${_git}" == "false" ]]; then
     _src="${_evmfs_src}"
+    _sum="${_bundle_sum}"
     source+=(
       "${_sig_src}"
     )
     sha256sums+=(
-      "${_sig_sum}"
+      "${_bundle_sig_sum}"
     )
   fi
 elif [[ "${_evmfs}" == "false" ]]; then
