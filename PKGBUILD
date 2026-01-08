@@ -100,6 +100,7 @@ makedepends=(
   "boost"
   "cmake"
   "${_compiler}"
+  "ninja"
 )
 if [[ "${_os}" == "Android" ]]; then
   makedepends+=(
