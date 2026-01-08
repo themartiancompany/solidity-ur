@@ -62,6 +62,20 @@ if [[ "${_os}" == "Android" ]]; then
 elif [[ "${_os}" == "GNU/Linux" ]]; then
   _compiler="gcc"
 fi
+if [[ ! -v "_cmake_generator" ]]; then
+  _cmake_generator="ninja"
+fi
+if [[ ! -v "_archive_format" ]]; then
+  if [[ "${_git}" == "true" ]]; then
+    if [[ "${_evmfs}" == "true" ]]; then
+      _archive_format="bundle"
+    elif [[ "${_evmfs}" == "false" ]]; then
+      _archive_format="git"
+    fi
+  elif [[ "${_git}" == "false" ]]; then
+    _archive_format="tar.gz"
+  fi
+fi
 _pkg=solidity
 pkgbase="${_pkg}"
 pkgname+=(
@@ -83,7 +97,7 @@ arch=(
   "powerpc"
   "pentium4"
 )
-_http="https://github.com"
+_http="https://${_git_service}.com"
 _ns="ethereum"
 url="${_http}/${_ns}/${pkgname}"
 license=(
@@ -100,12 +114,22 @@ makedepends=(
   "boost"
   "cmake"
   "${_compiler}"
-  "ninja"
+  "${_cmake_generator}"
 )
 if [[ "${_os}" == "Android" ]]; then
   makedepends+=(
     "boost-headers"
     "boost-static"
+  )
+fi
+if [[ "${_git}" == "true" ]]; then
+  makedepends+=(
+    "git"
+  )
+fi
+if [[ "${_evmfs}" == "true" ]]; then
+  makedepends+=(
+    "evmfs"
   )
 fi
 checkdepends=(
@@ -125,22 +149,76 @@ conflicts=(
   "${_pkg}-bin"
   "${_pkg}-git"
 )
-_sum="77860b58f9d6c4a9a9cb1ceaae7ebe5d856f91f3ccd96f67d5ea6a019d79d1fb"
-_sig_sum="7f737e7a88fdb8e96b428974592def4bbdf5bf24656b12ac5af76084b7fca095"
-_sha512_sum="b08733619a4c1398a2b80d0fec83d56b3769af8dfa01a028c71ff89985f5c93d12c3c7d8bbcec29bb0816a9cc1d56bb099010e59a203bcf917b87ff1b0cf0241"
+if [[ "${_git}" == "false" ]]; then
+  _tag="${pkgver}"
+  _tag_name="pkgver"
+  _tarname="${pkgname}_${_tag}"
+elif [[ "${_git}" == "true" ]]; then
+  _tag="${_commit}"
+  _tag_name="commit"
+  _tarname="${pkgname}-${_tag}"
+fi
+_bundle_sum="77860b58f9d6c4a9a9cb1ceaae7ebe5d856f91f3ccd96f67d5ea6a019d79d1fb"
+_bundle_sig_sum="7f737e7a88fdb8e96b428974592def4bbdf5bf24656b12ac5af76084b7fca095"
+_github_release_sha512_sum="b08733619a4c1398a2b80d0fec83d56b3769af8dfa01a028c71ff89985f5c93d12c3c7d8bbcec29bb0816a9cc1d56bb099010e59a203bcf917b87ff1b0cf0241"
+# Dvorak
+_evmfs_ns="0x87003Bd6C074C713783df04f36517451fF34CBEf"
+_evmfs_network="100"
+_evmfs_address="0x69470b18f8b8b5f92b48f6199dcb147b4be96571"
+_evmfs_dir="evmfs://${_evmfs_network}/${_evmfs_address}/${_evmfs_ns}"
+_evmfs_uri="${_evmfs_dir}/${_bundle_sum}"
+_evmfs_src="${_tarfile}::${_evmfs_uri}"
+_sig_uri="${_evmfs_dir}/${_bundle_sig_sum}"
+_sig_src="${_tarfile}.sig::${_sig_uri}"
 if [[ "${_evmfs}" == "true" ]]; then
-  _uri=""
-elif [[ "${_evmfs}" == "false" ]]; then
   if [[ "${_git}" == "false" ]]; then
-    _uri="${url}/releases/download/v${pkgver}/${pkgname}_${pkgver}.tar.gz"
+    _src="${_evmfs_src}"
+    source+=(
+      "${_sig_src}"
+    )
+    sha256sums+=(
+      "${_sig_sum}"
+    )
+  fi
+elif [[ "${_evmfs}" == "false" ]]; then
+  if [[ "${_git}" == true ]]; then
+    _src="${_tarname}::git+${_url}#${_tag_name}=${_tag}?signed"
+    _sum="SKIP"
+  elif [[ "${_git}" == false ]]; then
+    _uri=""
+    if [[ "${_git_service}" == "github" ]]; then
+      if [[ "${_tag_name}" == "commit" ]]; then
+        _uri="${_url}/archive/${_commit}.${_archive_format}"
+        _sum="SKIP"
+      elif [[ "${_tag_name}" == "pkgver" ]]; then
+        _uri="${url}/releases/download/v${pkgver}/${pkgname}_${pkgver}.tar.gz"
+        sha512sums=(
+          "${_github_release_sha512_sum}"
+        )
+      fi
+    elif [[ "${_git_service}" == "gitlab" ]]; then
+      if [[ "${_tag_name}" == "commit" ]]; then
+        _uri="${_url}/-/archive/${_tag}/${_tag}.${_archive_format}"
+      fi
+    fi
+    _src="${_tarfile}::${_uri}"
   fi
 fi
-_src="${_pkg}-v${pkgver}.tar.gz::${_uri}"
-source=(
+source+=(
   "${_src}"
 )
-sha512sums=(
-  "${_sha512_sum}"
+sha256sums+=(
+  "${_sum}"
+)
+validpgpkeys=(
+  # Truocolo
+  #   <truocolo@aol.com>
+  '97E989E6CF1D2C7F7A41FF9F95684DBE23D6A3E9'
+  #   <truocolo@0x6E5163fC4BFc1511Dbe06bB605cc14a3e462332b>
+  'F690CBC17BD1F53557290AF51FC17D540D0ADEED'
+  # Pellegrino Prevete (dvorak)
+  #   <dvorak@0x87003Bd6C074C713783df04f36517451fF34CBEf>
+  '12D8E3D7888F741E89F86EE0FEC8567A644F1D16'
 )
 
 _bin_get() {
