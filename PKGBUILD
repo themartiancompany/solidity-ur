@@ -63,7 +63,8 @@ elif [[ "${_os}" == "GNU/Linux" ]]; then
   _compiler="gcc"
 fi
 if [[ ! -v "_cmake_generator" ]]; then
-  _cmake_generator="ninja"
+  _cmake_generator="make"
+  # _cmake_generator="ninja"
 fi
 if [[ ! -v "_archive_format" ]]; then
   if [[ "${_git}" == "true" ]]; then
@@ -84,7 +85,7 @@ pkgname+=(
 pkgver="0.8.30"
 _commit="73712a01b2de56d9ad91e3b6936f85c90cb7de36"
 _bundle_commit="142aa62e6805505b6a06cbeeec530f5c8bf0bfdd"
-pkgrel=4
+pkgrel=5
 pkgdesc="Smart contract programming language."
 arch=(
   "x86_64"
@@ -112,7 +113,7 @@ optdepends=(
 )
 makedepends=(
   "boost"
-  "cmake"
+  "cmake3"
   "${_compiler}"
   "${_cmake_generator}"
 )
