@@ -200,12 +200,88 @@ _build() {
     -df
     --nocheck
   )
-  pacman \
-    -S \
-    --noconfirm \
-    $(recipe-get \
-        "/home/user/${_pkgname}/PKGBUILD" \
-        "makedepends")
+  for _depend in $(recipe-get \
+                     "${_pkgbuild}" \
+        "makedepends"); do
+    _resolve_flag="false"
+    _depend_target="${_depend}"
+    for _sep in "${_separators[@]}"; do
+      if [[ "${_depend}" == *"${_sep}"* ]]; then
+        _depend_name="${_depend%${_sep}*}"
+        _depend_pkgver="${_depend#${_depend_name}}"
+        _resolve_flag="true"
+        _depend_target="${_depend_name}"
+        break
+      fi
+    done
+    if [[ "${_resolve_flag}" == "true" ]]; then
+      _msg=(
+        "It is requested version"
+        "'${_depend_pkgver}' of"
+        "package '${_depend_name}'."
+        "Be aware the Fur doesn't"
+        "look for provides currently."
+      )
+      echo \
+        "${_msg[*]}"
+    fi
+    _makedepends_set["${_depend_target}"]="1"
+  done
+  _makedepends=(
+      "${!_makedepends_set[@]}"
+  )
+  _fur_opts+=(
+    -v
+    -p
+      "pacman"
+  )
+  for _depend in "${_makedepends[@]}"; do
+    _msg=(
+      "Installing makedepend"
+      "'${_depend}'"
+      "with pacman."
+    )
+    echo \
+      "${_msg[*]}"
+    pacman \
+      -S \
+      --noconfirm \
+        "${_depend}" || \
+      true
+    _msg=(
+      "Installing makedepends"
+      "'${_depend}' with"
+      "fur."
+    )
+    echo \
+      "${_msg[*]}"
+    fur \
+      "${_fur_opts[@]}" \
+      -t \
+        "ci" \
+      -n \
+        "${ns}" \
+      "${_depend}" || \
+    fur \
+      "${_fur_opts[@]}" \
+      -t \
+        "tree" \
+      -m \
+        "gitlab" \
+      -l \
+        "bur" \
+      "${_depend}" || \
+    fur \
+      "${_fur_opts[@]}" \
+      -t \
+        "tree" \
+      -m \
+        "github" \
+      -l \
+        "fur" \
+      "${_depend}" || \
+    true
+  done
   _cmd+=(
     "cd"
       "/home/user/${_pkgname}" "&&"
