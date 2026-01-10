@@ -85,7 +85,7 @@ pkgname+=(
 pkgver="0.8.30"
 _commit="73712a01b2de56d9ad91e3b6936f85c90cb7de36"
 _bundle_commit="142aa62e6805505b6a06cbeeec530f5c8bf0bfdd"
-pkgrel=12
+pkgrel=13
 pkgdesc="Smart contract programming language."
 arch=(
   "x86_64"
