@@ -330,7 +330,8 @@ _requirements() {
     mv \
       "${HOME}/${_pkgname}-${_commit}.tar.gz" \
       "/home/user/${_pkgname}"
-  fi
+  fi || \
+  true
 }
 
 _build() {
