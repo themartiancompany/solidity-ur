@@ -337,18 +337,55 @@ _build() {
   local \
     _reallymakepkg_opts=() \
     _makepkg_opts=() \
+    _makedepends=() \
     _cmd=() \
-    _pkgname
+    _depend \
+    _depend_name \
+    _depend_pkgver \
+    _depend_target \
+    _home \
+    _pkgbuild \
+    _pkgname \
+    _resolve_flag \
+    _work_dir \
+    _separators=()
+  declare \
+    -A \
+    _makedepends_set
+  _separators=(
+    "<"
+    ">"
+    "<="
+    ">="
+    "="
+  )
+  _home="/home/user"
   _pkgname="${pkg%-ur}"
+  _work_dir="${_home}/ramdisk/${_pkgname}-build"
+  _pkgbuild="${_home}/${_pkgname}/PKGBUILD"
+  mount  |
+    grep \
+      "${_home}/ramdisk"
   _reallymakepkg_opts+=(
     -v
     -w
-      "'${HOME}/${_pkgname}-build'"
+      "${_work_dir}"
   )
   _makepkg_opts+=(
     -df
     --nocheck
   )
+  if [[ "${ns}" != "themartiancompany" ]]; then
+    _evmfs="$( \
+      recipe-get \
+        "/home/user/${_pkgname}/PKGBUILD" \
+        "_evmfs")"
+    if [[ "${_evmfs}" == "false" ]]; then
+      _makepkg_opts+=(
+        --skipinteg
+      )
+    fi
+  fi
   for _depend in $(recipe-get \
                      "${_pkgbuild}" \
         "makedepends"); do
@@ -433,7 +470,7 @@ _build() {
   done
   _cmd+=(
     "cd"
-      "/home/user/${_pkgname}" "&&"
+      "${_home}/${_pkgname}" "&&"
     "reallymakepkg"
       "${_reallymakepkg_opts[@]}"
       "--"
@@ -442,16 +479,35 @@ _build() {
   su \
     -c \
     "${_cmd[*]}" - \
-    "user"
-  pacman \
-    -Udd \
-    --noconfirm \
-    "/home/user/${_pkgname}/"*".pkg.tar."*
+    "user" || \
+  true
+  _something_built="false"
+  for _file in "${_home}/${_pkgname}/"*".pkg.tar."*; do
+    _something_built="true"
+  done
+  if [[ "${_something_built}" == "true" ]]; then
+    pacman \
+      -Udd \
+      --noconfirm \
+      "${_home}/${_pkgname}/"*".pkg.tar."*
+  elif [[ "${_something_built}" == "false" ]]; then
+    _msg=(
+      "Build failed, printing"
+      "work directory content."
+    )
+    tree \
+      -L 5 \
+      "${_work_dir}"
+    tar \
+      cJf \
+      "build-directory.tar.xz" \
+      "${_work_dir}"
+  fi
   for _file \
-    in "/home/user/${_pkgname}/"*".pkg.tar."*; do
+    in "${_home}/${_pkgname}/"*".pkg.tar."*; do
     mv \
       "${_file}" \
-      "dogeos-gnu-$( \
+      "dogeos-gnu-$(
         basename \
           "${_file}")"
   done
