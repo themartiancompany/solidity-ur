@@ -138,7 +138,27 @@ _requirements() {
   local \
     _fur_mini_opts=() \
     _fur_opts=() \
-    _pkgname
+    _pkgname \
+    _commit \
+    _docs_commit \
+    _git_http \
+    _evm_chains_release_latest \
+    _evm_chains_explorers_release_latest \
+    _evm_chains_info_release_latest \
+    _evm_contracts_abi_get_release_latest \
+    _evm_contracts_tools_release_latest \
+    _evm_gnupg_release_latest \
+    _evm_wallet_release_latest \
+    _fur_release_latest \
+    _fur_release_public \
+    _gl_dl_release_latest \
+    _gur_release_latest \
+    _libcrash_bash_release_latest \
+    _libcrash_js_release_latest \
+    _node_run_release_latest \
+    _python_asyncio_throttle_release_latest \
+    _python_aioetherscan_release_latest \
+    _python_aiohttp_retry_release_latest
   _pkgname="${pkg%-ur}"
   _fur_mini_opts+=(
     "${platform}"
@@ -149,7 +169,7 @@ _requirements() {
   _fur_mini \
     "fur" \
     "${_fur_mini_opts[@]}"
-  _fur_release="0.0.1.1.1.1.1.1.1.1.1.1.1"
+  _fur_release_public="0.0.1.1.1.1.1.1.1.1.1.1.1"
   _fur_opts+=(
     -v
     -p
@@ -159,29 +179,158 @@ _requirements() {
   #   -S \
   #   --noconfirm \
   #   "sudo"
-  fur \
-    "${_fur_opts[@]}" \
-    "reallymakepkg"
+  _gur_mini \
+    "${ns}" \
+    "reallymakepkg" \
+    "1.2.5-1" || \
+  true
+  _evm_chains_release_latest="20250816-3"
+  _evm_chains_explorers_release_latest="0.0.0.0.0.0.0.0.0.0.1.1.1-3"
+  _evm_chains_info_release_latest="0.0.0.0.0.0.0.0.0.0.1.1.1.1.1.1.1-6"
+  _evm_contracts_abi_get_release_latest="0.0.0.0.0.0.0.0.0.0.0.1.1.1.1.1.1-2"
+  _evm_contract_tools_release_latest="0.0.0.0.0.0.0.0.1.1.1.1.1-1"
+  _evm_gnupg_release_latest="0.0.0.0.0.0.0.0.1.1.1.1.1.1-3"
+  _evm_wallet_release_latest="0.0.0.0.0.0.0.0.0.0.1.1.1-3"
+  _fur_release_latest="1.0.0.0.0.0.0.0.0.0.1.1-1"
+  _gl_dl_release_latest="0.0.0.0.0.0.0.0.0.0.0.0.1.1.1.1.1.1-3"
+  _gur_release_latest="0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.1-1"
+  _key_gen_release_latest="0.0.0.0.0.0.0.0.0.0.0.1-2"
+  _libcrash_bash_release_latest="0.0.0.0.0.1.1.1.1.1-8"
+  _libcrash_js_release_latest="0.1.69-25"
+  _libevm_release_latest="0.0.0.0.0.0.0.0.1.1.1.1.1.1.1-4"
+  _node_run_release_latest="0.0.0.0.0.0.0.0.1-8"
+  _python_aiohttp_retry_release_latest="2.8.3-4"
+  _python_aioetherscan_release_latest="0.9.6.1-7"
+  _python_asyncio_throttle_release_latest="1.0.2-4"
+  _ucantellme_release_latest="0.0.0.0.0.0.0.0.0.0.0.0.0.1.1.1-2"
+  _gur_mini \
+    "${ns}" \
+    "libcrash-bash" \
+    "${_libcrash_bash_release_latest}" \
+    "n" || \
+  true
+  _gur_mini \
+    "${ns}" \
+    "libcrash-js" \
+    "${_libcrash_js_release_latest}" \
+    "n" || \
+  true
+  _gur_mini \
+    "${ns}" \
+    "node-run" \
+    "${_node_run_release_latest}" \
+    "n" || \
+  true
+  _gur_mini \
+    "${ns}" \
+    "gl-dl" \
+    "${_gl_dl_release_latest}" \
+    "n" || \
+  true
+  _gur_mini \
+    "${ns}" \
+    "ucantellme" \
+    "${_ucantellme_release_latest}" \
+    "n" || \
+  true
+  _gur_mini \
+    "${ns}" \
+    "key-gen" \
+    "${_key_gen_release_latest}" \
+    "n" || \
+  true
+  _gur_mini \
+    "${ns}" \
+    "evm-chains" \
+    "${_evm_chains_release_latest}" \
+    "n" || \
+  true
+  _gur_mini \
+    "${ns}" \
+    "evm-chains-explorers" \
+    "${_evm_chains_explorers_release_latest}" \
+    "n" || \
+  true
+  _gur_mini \
+    "${ns}" \
+    "evm-chains-info" \
+    "${_evm_chains_info_release_latest}" || \
+  true
+  _gur_mini \
+    "${ns}" \
+    "libevm" \
+    "${_libevm_release_latest}" || \
+  true
+  _gur_mini \
+    "${ns}" \
+    "python-asyncio-throttle" \
+    "${_python_asyncio_throttle_release_latest}" || \
+  true
+  _gur_mini \
+    "${ns}" \
+    "python-aiohttp-retry" \
+    "${_python_aiohttp_retry_release_latest}" || \
+  true
+  _gur_mini \
+    "${ns}" \
+    "python-aioetherscan" \
+    "${_python_aioetherscan_release_latest}" || \
+  true
+  _gur_mini \
+    "${ns}" \
+    "evm-contracts-abi-get" \
+    "${_evm_contracts_abi_get_release_latest}" || \
+  true
+  _gur_mini \
+    "${ns}" \
+    "evm-wallet" \
+    "${_evm_wallet_release_latest}" || \
+  true
+  _gur_mini \
+    "${ns}" \
+    "evm-contracts-tools" \
+    "${_evm_contract_tools_release_latest}" || \
+  true
+  _gur_mini \
+    "${ns}" \
+    "evm-gnupg" \
+    "${_evm_gnupg_release_latest}" || \
+  true
+  _gur_mini \
+    "${ns}" \
+    "gur" \
+    "${_gur_release_latest}" || \
+  true
   _gur_mini \
     "${ns}" \
     "fur" \
-    "1.0.0.0.0.0.0.0.0.0.0.0.0.1.1.1.1-2"
-  # ohoh
-  recipe-get \
-    -v \
-    "/home/user/${_pkgname}/PKGBUILD" \
-    "_commit"
-  _commit="$( \
+    "${_fur_release_latest}" || \
+  true
+  pacman \
+    -S \
+    --noconfirm \
+    "tree" \
+    "github-cli" \
+    "unzip"
+  _git_http="$(
     recipe-get \
       "/home/user/${_pkgname}/PKGBUILD" \
-      "_commit")"
-  _gl_dl_mini \
-    "${ns}" \
-    "${_pkgname}" \
-    "${_commit}"
-  mv \
-    "${HOME}/${_pkgname}-${_commit}.tar.gz" \
-    "/home/user/${_pkgname}"
+      "_git_http" || \
+      true)"
+  # ohoh
+  if [[ "${_git_http}" == "gitlab" ]]; then
+    _commit="$(
+      recipe-get \
+        "/home/user/${_pkgname}/PKGBUILD" \
+        "_commit")"
+    _gl_dl_mini \
+      "${ns}" \
+      "${_pkgname}" \
+      "${_commit}"
+    mv \
+      "${HOME}/${_pkgname}-${_commit}.tar.gz" \
+      "/home/user/${_pkgname}"
+  fi
 }
 
 _build() {

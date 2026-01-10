@@ -85,7 +85,7 @@ pkgname+=(
 pkgver="0.8.30"
 _commit="73712a01b2de56d9ad91e3b6936f85c90cb7de36"
 _bundle_commit="142aa62e6805505b6a06cbeeec530f5c8bf0bfdd"
-pkgrel=7
+pkgrel=8
 pkgdesc="Smart contract programming language."
 arch=(
   "x86_64"
@@ -151,6 +151,7 @@ conflicts=(
   "${_pkg}-git"
 )
 if [[ "${_git}" == "false" ]]; then
+
   _tag="${pkgver}"
   _tag_name="pkgver"
   _tarname="${pkgname}_${_tag}"
@@ -287,7 +288,7 @@ _compile() {
     _cc \
     _cxx \
     _cxx_compiler
-  _cc="$( \
+  _cc="$(
     command \
       -v \
       "${_compiler}")"
@@ -296,7 +297,7 @@ _compile() {
   elif [[ "${_compiler}" == "clang" ]]; then
    _cxx_compiler="${_compiler}++"
   fi
-  _cxx="$( \
+  _cxx="$(
     command \
       -v \
       "${_cxx_compiler}")"
@@ -356,6 +357,7 @@ build()
     "OFF"
     # "ON"
   )
+  ls
   for _tests_switch_status \
     in "${_tests_switch[@]}"; do
     _compile \
