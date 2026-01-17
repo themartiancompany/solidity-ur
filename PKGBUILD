@@ -117,6 +117,7 @@ makedepends=(
   "cmake3"
   "${_compiler}"
   "${_cmake_generator}"
+  "fmt"
 )
 if [[ "${_os}" == "Android" ]]; then
   makedepends+=(
