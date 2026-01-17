@@ -107,6 +107,8 @@ license=(
 )
 depends=(
   "boost-libs"
+  "fmt"
+  "nlohmann-json"
 )
 optdepends=(
   "cvc4: SMT checker"
@@ -118,6 +120,7 @@ makedepends=(
   "${_compiler}"
   "${_cmake_generator}"
   "fmt"
+  "nlohmann-json"
 )
 if [[ "${_os}" == "Android" ]]; then
   makedepends+=(
