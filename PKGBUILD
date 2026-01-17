@@ -326,8 +326,12 @@ _compile() {
       TESTS="${_tests}"
     -D
       USE_LD_GOLD="OFF"
+    # Introduced somewhere after 0.8.28
     -D
-      USE_SYSTEM_LIBRARIES="OFF"
+      IGNORE_VENDORED_DEPENDENCIES="OFF"
+    # Disabled somewhere after 0.8.28
+    # -D
+    #   USE_SYSTEM_LIBRARIES="OFF"
     -S
       "${srcdir}/${pkgname}_${pkgver}/"
     -Wno-dev
