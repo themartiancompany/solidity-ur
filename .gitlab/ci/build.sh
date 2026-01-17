@@ -363,7 +363,7 @@ _build() {
   )
   _home="/home/user"
   _pkgname="${pkg%-ur}"
-  _work_dir="${_home}/ramdisk/${_pkgname}-build"
+  _work_dir="${_home}/${_pkgname}-build"
   _pkgbuild="${_home}/${_pkgname}/PKGBUILD"
   mount  |
     grep \
