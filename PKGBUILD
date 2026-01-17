@@ -109,6 +109,7 @@ depends=(
   "boost-libs"
   "fmt"
   "nlohmann-json"
+  "range-v3"
 )
 optdepends=(
   "cvc4: SMT checker"
@@ -121,6 +122,7 @@ makedepends=(
   "${_cmake_generator}"
   "fmt"
   "nlohmann-json"
+  "range-v3"
 )
 if [[ "${_os}" == "Android" ]]; then
   makedepends+=(
