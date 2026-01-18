@@ -58,7 +58,7 @@ _gl_dl_upload() {
     echo \
       "${_msg[*]}"
   fi
-  _token="PRIVATE-TOKEN: $( \
+  _token="PRIVATE-TOKEN: $(
     cat \
       "${_token_private}")"
   _curl_opts+=(
@@ -87,47 +87,66 @@ _upload() {
     _curl_opts=() \
     _release_cli_create_opts=() \
     _msg=() \
-    _pkgname
+    _pkgname \
+    _something_found
   _pkgname="${pkg%-ur}"
   pwd
   ls
+  _something_found="false"
   for _file \
-    in "dogeos-"*".pkg.tar."*; do
+    in $(find \
+           "${PWD}" \
+           -maxdepth \
+             "1" \
+           -type \
+             "f" \
+           -iname \
+             "dogeos-*.pkg.tar.*"); do
     _url="${package_registry_url}/${_pkgname}/${tag}/${_file}"
     _gl_dl_upload \
       "$(pwd)/${_file}" \
       "${_url}"
-    _asset_link="{$( \
+    _asset_link="{$(
       printf \
       '"name":"'${_file}'","url":"'${_url}'"}')"
     _assets_links_json+=(
       "${_asset_link}"
     )
+    _something_found="true"
   done
-  _assets_link="$( \
-    printf \
-      '%s,' \
-      "${_assets_links_json[@]}")"
-  _assets_link="[${_assets_link::-1}]"
-  _release_cli_create_opts+=(
-    --name
-      "Release: ${tag}"
-    --tag-name
-      "${tag}"
-  )
-  _msg=(
-    "Running 'release-cli'"
-    "with options"
-    "create"
-    "'${_release_cli_create_opts[*]} --assets-link=${_assets_link}'."
-  )
-  echo \
-    "${_msg[*]}"
-  release-cli \
-    --debug \
-    create \
-    "${_release_cli_create_opts[@]}" \
-    --assets-link="${_assets_link}"
+  if [[ "${_something_found}" == "false" ]]; then
+    _msg=(
+      "No artifacts found,"
+      "not releasing anything."
+    )
+    echo \
+      "${_msg[*]}"
+  elif [[ "${_something_found}" == "true" ]]; then
+    _assets_link="$(
+      printf \
+        '%s,' \
+        "${_assets_links_json[@]}")"
+    _assets_link="[${_assets_link::-1}]"
+    _release_cli_create_opts+=(
+      --name
+        "Release: ${tag}"
+      --tag-name
+        "${tag}"
+    )
+    _msg=(
+      "Running 'release-cli'"
+      "with options"
+      "create"
+      "'${_release_cli_create_opts[*]} --assets-link=${_assets_link}'."
+    )
+    echo \
+      "${_msg[*]}"
+    release-cli \
+      --debug \
+      create \
+      "${_release_cli_create_opts[@]}" \
+      --assets-link="${_assets_link}"
+  fi
 }
 
 readonly \

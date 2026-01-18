@@ -156,6 +156,7 @@ build:
   artifacts:
     paths:
       - dogeos-gnu-*.pkg.tar.*
+      - build-directory.tar.xz
     reports:
       metrics: output/metrics.txt
   extends: .build
