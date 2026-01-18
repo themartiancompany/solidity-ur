@@ -346,6 +346,7 @@ _build() {
     _depend_pkgver \
     _depend_target \
     _home \
+    _oldpwd \
     _pkgbuild \
     _pkgname \
     _resolve_flag \
@@ -504,10 +505,18 @@ _build() {
     tree \
       -L 5 \
       "${_work_dir}"
+    _oldpwd="${PWD}"
+    cd \
+      "${_work_dir}"
     tar \
       cJf \
       "build-directory.tar.xz" \
-      "${_work_dir}"
+      *
+    mv \
+      "build-directory.tar.xz" \
+      "${_oldpwd}"
+    cd \
+      "${_oldpwd}"
   fi
   for _file \
     in "${_home}/${_pkgname}/"*".pkg.tar."*; do
