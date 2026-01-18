@@ -181,9 +181,7 @@ build:
 release:
   artifacts:
     reports:
-      metrics: output/metrics.txt
-    paths:
-      - build-directory.tar.xz
+      metrics: build-directory.tar.xz
   stage: build
   extends: .release
   parallel:
