@@ -357,7 +357,9 @@ _compile() {
   CXX="${_cxx}" \
   cmake \
     --build \
-      "${srcdir}/${pkgname}_${pkgver}/build/"
+      "${srcdir}/${pkgname}_${pkgver}/build/" \
+    2>&1 > \
+    "${srcdir}/build.log"
 }
 
 build()

@@ -53,7 +53,7 @@ _gur_mini() {
     "${_msg[*]}"
   _gl_dl_retrieve \
     "https://gitlab.com/api/v4/projects/${_ns}%2F${_pkg}-ur"
-  _project_id="$( \
+  _project_id="$(
     cat \
       "${HOME}/${_ns}%2F${_pkg}-ur" | \
       jq \
@@ -62,7 +62,7 @@ _gur_mini() {
   _url="${_api}/projects/${_project_id}/releases"
   _gl_dl_retrieve \
     "${_url}"
-  _urls=( $( \
+  _urls=( $(
     cat \
       "${HOME}/releases" | \
       jq \
@@ -72,7 +72,7 @@ _gur_mini() {
           '.direct_asset_url')
   )
   for _url in "${_urls[@]}"; do
-    _file="$( \
+    _file="$(
       basename \
         "${_url}")"
     _output_file="$(pwd)/${_file}"
@@ -114,7 +114,7 @@ _fur_mini() {
     --single-branch
     --depth=1
   )
-  _tmp_dir="$( \
+  _tmp_dir="$(
     mktemp \
       "${_mktemp_opts[@]}")"
   git \
@@ -170,11 +170,11 @@ _requirements() {
     "fur" \
     "${_fur_mini_opts[@]}"
   _fur_release_public="0.0.1.1.1.1.1.1.1.1.1.1.1"
-  _fur_opts+=(
-    -v
-    -p
-      "pacman"
-  )
+  # _fur_opts+=(
+  #   -v
+  #   -p
+  #     "pacman"
+  # )
   # pacman \
   #   -S \
   #   --noconfirm \
@@ -350,7 +350,8 @@ _build() {
     _pkgname \
     _resolve_flag \
     _work_dir \
-    _separators=()
+    _separators=() \
+    _msg=()
   declare \
     -A \
     _makedepends_set
@@ -378,7 +379,7 @@ _build() {
     --nocheck
   )
   if [[ "${ns}" != "themartiancompany" ]]; then
-    _evmfs="$( \
+    _evmfs="$(
       recipe-get \
         "/home/user/${_pkgname}/PKGBUILD" \
         "_evmfs")"
@@ -486,6 +487,7 @@ _build() {
   _something_built="false"
   for _file in "${_home}/${_pkgname}/"*".pkg.tar."*; do
     _something_built="true"
+    break
   done
   if [[ "${_something_built}" == "true" ]]; then
     pacman \
@@ -497,6 +499,8 @@ _build() {
       "Build failed, printing"
       "work directory content."
     )
+    echo \
+      "${_msg[*]}"
     tree \
       -L 5 \
       "${_work_dir}"
@@ -557,7 +561,7 @@ _gl_dl_retrieve() {
     _output_file \
     _msg=() \
     _token_missing
-  _output_file="${HOME}/$( \
+  _output_file="${HOME}/$(
     basename \
       "${_url#https://}")"
   _token_private="${HOME}/.config/gitlab.com/default.txt"
@@ -586,7 +590,7 @@ _gl_dl_retrieve() {
     exit \
       1
   fi
-  _token="PRIVATE-TOKEN: $( \
+  _token="PRIVATE-TOKEN: $(
     cat \
       "${_token_private}")"
   _curl_opts+=(
