@@ -52,6 +52,24 @@ if [[ ! -v "_evmfs" ]]; then
     _evmfs="false"
   fi
 fi
+_boost_pkgver="$(
+  pacman \
+    -Qi \
+      "boost-libs" |
+    grep \
+      "Version" |
+      awk \
+        '{print $3}' |
+        rev |
+          cut \
+            -d \
+              "-" \
+            -f \
+              "1" \
+            --complement |
+            rev || \
+  echo \
+    "null")"
 if [[ ! -v "_git" ]]; then
   _git="false"
 fi
@@ -86,6 +104,7 @@ pkgname+=(
 pkgver="0.8.30"
 _commit="73712a01b2de56d9ad91e3b6936f85c90cb7de36"
 _bundle_commit="142aa62e6805505b6a06cbeeec530f5c8bf0bfdd"
+_0_8_30_1_commit="8b8767a80b768e2ca75386f4ce224c15f77dc286"
 pkgrel=25
 pkgdesc="Smart contract programming language."
 arch=(
@@ -100,8 +119,31 @@ arch=(
   "pentium4"
 )
 _http="https://${_git_service}.com"
-_ns="ethereum"
-url="${_http}/${_ns}/${pkgname}"
+# In late 2025 or 2026, according
+# to Github, Solidity publishing
+# namespace seems to have been moved
+# moved from 'ethereum' to 'argotorg'
+# _ns="ethereum"
+# Despite this, Solidity 0.8.30 requires
+# changes to be built with Boost versions
+# later than 1.83 which are only published
+# on The Martian Company namespaces.
+_boost_oldest="$(
+  printf \
+    "%s\n%s" \
+    "1.89" \
+    "${_boost_pkgver}" |
+    sort \
+      -V |
+      head \
+        -n \
+	  1)"
+if [[ "${_boost_oldest}" == "1.89" ]]; then
+  _ns="themartiancompany"
+elif [[ "${_boost_oldest}" != "1.89" ]]; then
+  _ns="argotorg"
+fi
+url="${_http}/${_ns}/${_pkg}"
 license=(
   "GPL-3.0-or-later"
 )
@@ -158,18 +200,20 @@ conflicts=(
   "${_pkg}-git"
 )
 if [[ "${_git}" == "false" ]]; then
-
   _tag="${pkgver}"
   _tag_name="pkgver"
-  _tarname="${pkgname}_${_tag}"
+  _tarname="${_pkg}_${_tag}"
 elif [[ "${_git}" == "true" ]]; then
   _tag="${_commit}"
   _tag_name="commit"
-  _tarname="${pkgname}-${_tag}"
+  _tarname="${_pkg}-${_tag}"
+  _0_8_30_1_tarname="${_pkg}-${_0_8_30_1_commit}"
 fi
 _tarfile="${_tarname}.${_archive_format}"
 _bundle_sum="77860b58f9d6c4a9a9cb1ceaae7ebe5d856f91f3ccd96f67d5ea6a019d79d1fb"
 _bundle_sig_sum="7f737e7a88fdb8e96b428974592def4bbdf5bf24656b12ac5af76084b7fca095"
+_0_8_30_1_bundle_sum="ee1e8be598e10ab639454e3cfe7cde53b6573afc297ce72a9cae12c569cd0051"
+_0_8_30_1_bundle_sig_sum="7c36822399acda42434958d07ab6fcfbff45a2f654bc06edeed046c362e9e186"
 _github_release_sum="5e8d58dff551a18205e325c22f1a3b194058efbdc128853afd75d31b0568216d"
 _github_release_sha512_sum="b08733619a4c1398a2b80d0fec83d56b3769af8dfa01a028c71ff89985f5c93d12c3c7d8bbcec29bb0816a9cc1d56bb099010e59a203bcf917b87ff1b0cf0241"
 # Dvorak
@@ -202,7 +246,7 @@ elif [[ "${_evmfs}" == "false" ]]; then
         _uri="${_url}/archive/${_commit}.${_archive_format}"
         _sum="SKIP"
       elif [[ "${_tag_name}" == "pkgver" ]]; then
-        _uri="${url}/releases/download/v${pkgver}/${pkgname}_${pkgver}.tar.gz"
+        _uri="${url}/releases/download/v${pkgver}/${_pkg}_${pkgver}.tar.gz"
 	_sum="${_github_release_sum}"
         sha512sums=(
           "${_github_release_sha512_sum}"
@@ -236,7 +280,6 @@ validpgpkeys=(
 _git_unbundle() {
   local \
     _tarname="${1}" \
-    _module \
     _bundle \
     _repo \
     _msg=()
@@ -255,7 +298,37 @@ _git_unbundle() {
     -C \
       "${_repo}" \
       pull || \
-    true
+  true
+}
+
+_git_unbundle_update() {
+  local \
+    _repo="${1}" \
+    _bundle="${2}" \
+    _repo \
+    _msg=()
+  _bundle_name="$(
+    basename \
+      "${_bundle}")"
+  _msg=(
+    "Updating '${_repo}' from '${_bundle}'."
+  )
+  msg \
+    "${_msg[*]}"
+  git \
+    -C \
+      "${_repo}" \
+      remote \
+        add \
+          "${_bundle_name}" \
+	  "${_bundle}" ||
+  true
+  git \
+    -C \
+      "${_repo}" \
+    pull \
+      "${_bundle_name}" || \
+  true
 }
 
 prepare() {
@@ -263,16 +336,20 @@ prepare() {
     if [[ "${_git}" == "true" ]]; then
       _git_unbundle \
         "${_tarname}"
+      if [[ "${_boost_oldest}" == "1.89" ]]; then
+        _git_unbundle_update \
+          "${srcdir}/${_tarname}" \
+          "${srcdir}/${_pkg}-${_0_8_30_1_commit}"
+      fi
     fi
   fi
 }
-
 
 _bin_get() {
   local \
     _cc \
     _bin
-  _cc="$( \
+  _cc="$(
     command \
       -v \
       "cc" \
@@ -281,7 +358,7 @@ _bin_get() {
       head \
         -n \
           1)"
-  _bin="$( \
+  _bin="$(
     dirname \
       "${_cc}")"
   echo \
@@ -341,7 +418,7 @@ _compile() {
     # -D
     #   USE_SYSTEM_LIBRARIES="OFF"
     -S
-      "${srcdir}/${pkgname}_${pkgver}/"
+      "${srcdir}/${_pkg}_${pkgver}/"
     -Wno-dev
   )
   export \
@@ -351,13 +428,13 @@ _compile() {
   CXX="${_cxx}" \
   cmake \
     -B \
-      "${srcdir}/${pkgname}_${pkgver}/build/" \
+      "${srcdir}/${_pkg}_${pkgver}/build/" \
     "${_cmake_opts[@]}"
   CC="${_cc}" \
   CXX="${_cxx}" \
   cmake \
     --build \
-      "${srcdir}/${pkgname}_${pkgver}/build/" \
+      "${srcdir}/${_pkg}_${pkgver}/build/" \
     2>&1 > \
     "${srcdir}/build.log"
 }
@@ -383,11 +460,11 @@ check()
 {
   _compile \
     "ON"
-  "${srcdir}/${pkgname}_${pkgver}/build/test/soltest" \
+  "${srcdir}/${_pkg}_${pkgver}/build/test/soltest" \
     -p \
       true -- \
     --testpath \
-      "${srcdir}/${pkgname}_${pkgver}/test/"
+      "${srcdir}/${_pkg}_${pkgver}/test/"
   _compile \
     "OFF"
 }
@@ -401,12 +478,12 @@ package_solidity() {
   # Assure that the directories exist.
   mkdir \
     -p \
-      "${pkgdir}/usr/share/doc/${pkgname}/"
+      "${pkgdir}/usr/share/doc/${_pkg}/"
   # Install the software.
   DESTDIR="${pkgdir}/" \
   cmake \
     --install \
-      "${srcdir}/${pkgname}_${pkgver}/build/"
+      "${srcdir}/${_pkg}_${pkgver}/build/"
   # Set version link
   ln \
     -s \
@@ -415,14 +492,14 @@ package_solidity() {
   # Install the documentation.
   install \
     -Dm644 \
-    "${srcdir}/${pkgname}_${pkgver}/README.md" \
-    "${pkgdir}/usr/share/doc/${pkgname}/"
+    "${srcdir}/${_pkg}_${pkgver}/README.md" \
+    "${pkgdir}/usr/share/doc/${_pkg}/"
   cp \
     -r \
-    "${srcdir}/${pkgname}_${pkgver}/docs/"* \
-    "${pkgdir}/usr/share/doc/${pkgname}/"
+    "${srcdir}/${_pkg}_${pkgver}/docs/"* \
+    "${pkgdir}/usr/share/doc/${_pkg}/"
   find \
-    "${pkgdir}/usr/share/doc/${pkgname}/" \
+    "${pkgdir}/usr/share/doc/${_pkg}/" \
     -type \
       d \
     -exec \
@@ -430,7 +507,7 @@ package_solidity() {
         755 \
 	{} +
   find \
-    "${pkgdir}/usr/share/doc/${pkgname}/" \
+    "${pkgdir}/usr/share/doc/${_pkg}/" \
     -type \
       f \
     -exec \

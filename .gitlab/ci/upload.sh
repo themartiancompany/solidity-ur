@@ -117,7 +117,9 @@ _upload() {
   if [[ "${_something_found}" == "false" ]]; then
     _msg=(
       "No artifacts found,"
-      "not releasing anything."
+      "not releasing."
+      "There should be a build-directory.tar.xz"
+      "in the job artifacts for debug."
     )
     echo \
       "${_msg[*]}"

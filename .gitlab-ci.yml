@@ -86,7 +86,7 @@ variables:
         "/root/.config/gitlab.com/default.txt"
       cp \
         "/root/.config/gitlab.com/default.txt" \
-        "/root/.config/gitlab.com/${CI_PROJECT_NAMESPACE}"
+        "/root/.config/gitlab.com/${CI_PROJECT_NAMESPACE}.txt"
       if [[ "${BUR_GPG_KEY}" == "" ]]; then
         _msg=(
           "Missing Bur GPG key."
@@ -156,7 +156,6 @@ build:
   artifacts:
     paths:
       - dogeos-gnu-*.pkg.tar.*
-      - build-directory.tar.xz
     reports:
       metrics: output/metrics.txt
   extends: .build
@@ -181,7 +180,11 @@ build:
 release:
   artifacts:
     reports:
-      metrics: build-directory.tar.xz
+      metrics: output/metrics.txt
+    when: on_failure
+    paths:
+      - build-directory.tar.xz
+
   stage: build
   extends: .release
   parallel:
