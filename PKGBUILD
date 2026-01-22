@@ -168,6 +168,11 @@ _boost_oldest="$(
 	  1)"
 if [[ "${_boost_oldest}" == "1.89" ]]; then
   _ns="themartiancompany"
+  if [[ "${_evmfs}" == "true" ]]; then
+  _commit="${_bundle_commit}"
+  elif [[ "${_evmfs}" == "false" ]]; then
+    _commit="${_0_8_30_1_commit}"
+  fi
 elif [[ "${_boost_oldest}" != "1.89" ]]; then
   _ns="argotorg"
 fi
