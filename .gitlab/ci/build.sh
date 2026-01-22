@@ -139,6 +139,12 @@ _check_tag_latest() {
     _pkgname="${1}" \
     _msg=() \
     _tag
+  git \
+    config \
+      --global \
+      --add \
+        "safe.directory" \
+        "/home/user/${_pkgname}"
   _tag="$(
     git \
       -C \
