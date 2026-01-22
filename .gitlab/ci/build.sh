@@ -142,7 +142,7 @@ _check_tag_latest() {
   _tag="$(
     git \
       -C \
-        "/home/user/${_pkgname}"
+        "/home/user/${_pkgname}" \
       tag |
       tail \
         -n \
