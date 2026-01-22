@@ -278,6 +278,7 @@ if [[ "${_evmfs}" == "true" ]]; then
       "ur"
       "${_like}"
     )
+    _src=""
   elif [[ "${_git}" == "false" ]]; then
     _src="${_evmfs_src}"
     _sum="${_bundle_sum}"
@@ -322,12 +323,14 @@ elif [[ "${_evmfs}" == "false" ]]; then
     _src="${_tarfile}::${_uri}"
   fi
 fi
-source+=(
-  "${_src}"
-)
-sha256sums+=(
-  "${_sum}"
-)
+if [[ "${_src}" != "" ]]; 
+  source+=(
+    "${_src}"
+  )
+  sha256sums+=(
+    "${_sum}"
+  )
+fi
 validpgpkeys=(
   # Truocolo
   #   <truocolo@aol.com>
