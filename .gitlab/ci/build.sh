@@ -138,7 +138,8 @@ _check_tag_latest() {
   local \
     _pkgname="${1}" \
     _msg=() \
-    _tag
+    _tag \
+    _tag_recipe
   git \
     config \
       --global \
@@ -153,6 +154,9 @@ _check_tag_latest() {
       tail \
         -n \
           1)"
+  if [[ "${_tag}" == "[MASKED]" ]]; then
+    _tag_recipe="$()"
+  fi
   if [[ "${_tag}" != "${tag}" ]]; then
     _msg=(
       "Current build tag '${tag}',"
@@ -191,8 +195,6 @@ _requirements() {
     _python_aioetherscan_release_latest \
     _python_aiohttp_retry_release_latest
   _pkgname="${pkg%-ur}"
-  _check_tag_latest \
-    "${_pkgname}"
   _fur_mini_opts+=(
     "${platform}"
   )
@@ -217,6 +219,8 @@ _requirements() {
     "reallymakepkg" \
     "1.2.5-1" || \
   true
+  _check_tag_latest \
+    "${_pkgname}"
   _evm_chains_release_latest="20250816-6"
   _evm_chains_explorers_release_latest="0.0.0.0.0.0.0.0.0.0.1.1.1-5"
   _evm_chains_info_release_latest="0.0.0.0.0.0.0.0.0.0.1.1.1.1.1.1.1-8"
