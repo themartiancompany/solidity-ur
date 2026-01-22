@@ -323,7 +323,7 @@ elif [[ "${_evmfs}" == "false" ]]; then
     _src="${_tarfile}::${_uri}"
   fi
 fi
-if [[ "${_src}" != "" ]]; 
+if [[ "${_src}" != "" ]]; then
   source+=(
     "${_src}"
   )
