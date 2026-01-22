@@ -57,7 +57,7 @@ _locale="$(
     grep \
       "LANG=" |
       awk \
-        -f \
+        -F \
           "=" \
         '{print $1}')"
 if [[ ! -v "_en" ]]; then
@@ -133,7 +133,7 @@ pkgver="0.8.30"
 _commit="73712a01b2de56d9ad91e3b6936f85c90cb7de36"
 _bundle_commit="142aa62e6805505b6a06cbeeec530f5c8bf0bfdd"
 _0_8_30_1_commit="8b8767a80b768e2ca75386f4ce224c15f77dc286"
-pkgrel=25
+pkgrel=26
 pkgdesc="Smart contract programming language."
 arch=(
   "x86_64"
@@ -256,7 +256,7 @@ _evmfs_src="${_tarfile}::${_evmfs_uri}"
 _sig_uri="${_evmfs_dir}/${_bundle_sig_sum}"
 _sig_src="${_tarfile}.sig::${_sig_uri}"
 _0_8_30_1_uri="${_evmfs_dir}/${_0_8_30_1_sum}"
-_0_8_30_1_src="${_0_8_30_1_tarfile}::${_0_8_3_1_uri}"
+_0_8_30_1_src="${_0_8_30_1_tarfile}::${_0_8_30_1_uri}"
 _0_8_30_1_sig_uri="${_evmfs_dir}/${_0_8_30_1_sig_sum}"
 _0_8_30_1_sig_src="${_0_8_30_1_tarfile}.sig::${_0_8_30_1_sig_uri}"
 if [[ "${_evmfs}" == "true" ]]; then
