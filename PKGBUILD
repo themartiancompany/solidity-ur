@@ -100,11 +100,25 @@ if [[ ! -v "_boost_pkgver" ]]; then
     echo \
       "null")"
 fi
+_boost_oldest="$(
+  printf \
+    "%s\n%s" \
+    "1.89" \
+    "${_boost_pkgver}" |
+    sort \
+      -V |
+      head \
+        -n \
+          1)"
 if [[ ! -v "_git" ]]; then
   _git="false"
 fi
 if [[ ! -v "_git_service" ]]; then
-  _git_service="github"
+  if [[ "${_boost_oldest}" == "1.89" ]]; then
+    _git_service="gitlab"
+  elif [[ "${_boost_oldest}" != "1.89" ]]; then
+    _git_service="github"
+  fi
 fi
 if [[ "${_os}" == "Android" ]]; then
   _compiler="clang"
@@ -135,7 +149,7 @@ pkgver="0.8.30"
 _commit="73712a01b2de56d9ad91e3b6936f85c90cb7de36"
 _bundle_commit="142aa62e6805505b6a06cbeeec530f5c8bf0bfdd"
 _0_8_30_1_commit="8b8767a80b768e2ca75386f4ce224c15f77dc286"
-pkgrel=30
+pkgrel=31
 pkgdesc="Smart contract programming language."
 arch=(
   "x86_64"
@@ -158,16 +172,6 @@ _http="https://${_git_service}.com"
 # changes to be built with Boost versions
 # later than 1.83 which are only published
 # on The Martian Company namespaces.
-_boost_oldest="$(
-  printf \
-    "%s\n%s" \
-    "1.89" \
-    "${_boost_pkgver}" |
-    sort \
-      -V |
-      head \
-        -n \
-	  1)"
 if [[ "${_boost_oldest}" == "1.89" ]]; then
   _ns="themartiancompany"
   if [[ "${_evmfs}" == "true" ]]; then
