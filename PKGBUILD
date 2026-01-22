@@ -52,6 +52,34 @@ if [[ ! -v "_evmfs" ]]; then
     _evmfs="false"
   fi
 fi
+_locale="$(
+  locale |
+    grep \
+      "LANG=" |
+      awk \
+        -f \
+          "=" \
+        '{print $1}')"
+if [[ ! -v "_en" ]]; then
+  _en="true"
+  if [[ "${_locale}" == "C.UTF-8" ]]; then
+    _en="true"
+  fi
+fi
+if [[ ! -v "_it" ]]; then
+  _it="true"
+  if [[ "${_locale}" == "it_IT.UTF-8" ]]; then
+    _it="true"
+  fi
+fi
+if [[ ! -v "_like" ]]; then
+  if [[ "${_it}" == "true" ]]; then
+    _like="mo-me-lo-segno"
+  fi
+  if [[ "${_en}" == "true" ]]; then
+    _like="never-gonna-give-you-up"
+  fi
+fi
 _boost_pkgver="$(
   pacman \
     -Qi \
@@ -93,7 +121,6 @@ if [[ ! -v "_archive_format" ]]; then
       _archive_format="git"
     fi
   elif [[ "${_git}" == "false" ]]; then
-    _ea_format="mp4"
     _archive_format="tar.gz"
   fi
 fi
@@ -204,8 +231,6 @@ if [[ "${_git}" == "false" ]]; then
   _tag="${pkgver}"
   _tag_name="pkgver"
   _tarname="${_pkg}_${_tag}"
-  _ea_name="ea.${_ea_format}"
-  _rr_name="rr.${_ea_format}"
 elif [[ "${_git}" == "true" ]]; then
   _tag="${_commit}"
   _tag_name="commit"
@@ -214,27 +239,18 @@ fi
 _0_8_30_1_tarname="${_pkg}-${_0_8_30_1_commit}"
 _tarfile="${_tarname}.${_archive_format}"
 _0_8_30_1_tarfile="${_0_8_30_1_tarname}.${_archive_format}"
-_ea_sum="bd4e7c8229c1d62c577693d491107bbd8362e4b4701b3e8302834dea1f9025ee"
-_ea_sig_sum="82c3748a136f04136f074ac3bcbf21e8f223b9a29dbd5cdbfb78dc145ffc8ef7"
 _bundle_sum="77860b58f9d6c4a9a9cb1ceaae7ebe5d856f91f3ccd96f67d5ea6a019d79d1fb"
 _bundle_sig_sum="7f737e7a88fdb8e96b428974592def4bbdf5bf24656b12ac5af76084b7fca095"
 _0_8_30_1_sum="ee1e8be598e10ab639454e3cfe7cde53b6573afc297ce72a9cae12c569cd0051"
 _0_8_30_1_sig_sum="7c36822399acda42434958d07ab6fcfbff45a2f654bc06edeed046c362e9e186"
 _github_release_sum="5e8d58dff551a18205e325c22f1a3b194058efbdc128853afd75d31b0568216d"
 _github_release_sha512_sum="b08733619a4c1398a2b80d0fec83d56b3769af8dfa01a028c71ff89985f5c93d12c3c7d8bbcec29bb0816a9cc1d56bb099010e59a203bcf917b87ff1b0cf0241"
-_rr_sum="f1c88cd06c7ad2f77652f7d21922cfdde6b02ec60c4cbc85e0c08cb42d0a4cc5"
-_rr_sig_sum="160abf49bd7785da896c63dc415ab3a08b86b11574af86c7493631073c79ac74"
 # Dvorak
 _evmfs_ns="0x87003Bd6C074C713783df04f36517451fF34CBEf"
 _kid_ns="0x926acb6aA4790ff678848A9F1C59E578B148C786"
 _evmfs_network="100"
 _evmfs_address="0x69470b18f8b8b5f92b48f6199dcb147b4be96571"
-_ea_uri="evmfs://${_evmfs_network}/${_evmfs_address}/${_kid_ns}/${_ea_sum}"
-_ea_src="${_ea_name}::${_ea_uri}"
-_ea_sig_uri="${_evmfs_dir}/${_ea_sig_sum}"
-_ea_sig_src="${_ea_name}.sig::${_ea_sig_uri}"
 _evmfs_dir="evmfs://${_evmfs_network}/${_evmfs_address}/${_evmfs_ns}"
-_evmfs_ea_dir="evmfs://${_evmfs_network}/${_evmfs_address}/${_kid_ns}"
 _evmfs_uri="${_evmfs_dir}/${_bundle_sum}"
 _evmfs_src="${_tarfile}::${_evmfs_uri}"
 _sig_uri="${_evmfs_dir}/${_bundle_sig_sum}"
@@ -243,42 +259,12 @@ _0_8_30_1_uri="${_evmfs_dir}/${_0_8_30_1_sum}"
 _0_8_30_1_src="${_0_8_30_1_tarfile}::${_0_8_3_1_uri}"
 _0_8_30_1_sig_uri="${_evmfs_dir}/${_0_8_30_1_sig_sum}"
 _0_8_30_1_sig_src="${_0_8_30_1_tarfile}.sig::${_0_8_30_1_sig_uri}"
-_rr_uri="evmfs://${_evmfs_network}/${_evmfs_address}/${_kid_ns}/${_rr_sum}"
-_rr_src="${_rr_name}::${_rr_uri}"
-_rr_sig_uri="${_evmfs_dir}/${_rr_sig_sum}"
-_rr_sig_src="${_rr_name}.sig::${_rr_sig_uri}"
 if [[ "${_evmfs}" == "true" ]]; then
   if [[ "${_git}" == "false" ]]; then
     makedepends+=(
-      "xdg-open"
+      "ur"
+      "${_like}"
     )
-    _locale="$(
-      locale |
-        grep \
-          "LANG=" |
-          awk \
-            -f \
-              "=" \
-            '{print $1}')"
-    if [[ "${_locale}" == "it_IT.UTF-8" ]]; then
-      source+=(
-        "${_ea_src}"
-        "${_ea_sig_src}"
-      )
-      sha256sums+=(
-        "${_ea_sum}"
-        "${_ea_sig_sum}"
-      )
-    elif [[ "${_locale}" == "C.UTF-8" ]]; then
-      source+=(
-        "${_rr_src}"
-        "${_rr_sig_src}"
-      )
-      sha256sums+=(
-        "${_rr_sum}"
-        "${_rr_sig_sum}"
-      )
-    fi
   elif [[ "${_git}" == "false" ]]; then
     _src="${_evmfs_src}"
     _sum="${_bundle_sum}"
@@ -396,7 +382,10 @@ _git_unbundle_update() {
 
 prepare() {
   if [[ "${_evmfs}" == "true" ]]; then
-    if [[ "${_git}" == "true" ]]; then
+    if [[ "${_git}" == "false" ]]; then
+      ur \
+        "${_like}"
+    elif [[ "${_git}" == "true" ]]; then
       _git_unbundle \
         "${_tarname}"
       if [[ "${_boost_oldest}" == "1.89" ]]; then
@@ -533,17 +522,6 @@ check()
 }
 
 package_solidity() {
-  local \
-    _name
-  for _name \
-    in "${_ea_name}" \
-       "${_rr_name}"; do
-    if [[ -e "${_name}" ]]; then
-      xdg-open \
-        "${_name}"
-      break
-    fi
-  done
   conflicts=(
     "solc"
     "solidity-bin"
