@@ -462,6 +462,12 @@ _build() {
     -p
       "pacman"
   )
+  _msg=(
+    "Found makedepends"
+    "'${_makedepends[*]}'."
+  )
+  echo \
+    "${_msg[*]}"
   for _depend in "${_makedepends[@]}"; do
     _msg=(
       "Installing makedepend"

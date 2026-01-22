@@ -84,7 +84,7 @@ if [[ ! -v "_boost_pkgver" ]]; then
   _boost_pkgver="$(
     pacman \
       -Qi \
-        "boost-libs" |
+        "boost" |
       grep \
         "Version" |
         awk \
