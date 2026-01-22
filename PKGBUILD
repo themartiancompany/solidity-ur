@@ -80,24 +80,26 @@ if [[ ! -v "_like" ]]; then
     _like="never-gonna-give-you-up"
   fi
 fi
-_boost_pkgver="$(
-  pacman \
-    -Qi \
-      "boost-libs" |
-    grep \
-      "Version" |
-      awk \
-        '{print $3}' |
-        rev |
-          cut \
-            -d \
-              "-" \
-            -f \
-              "1" \
-            --complement |
-            rev || \
-  echo \
-    "null")"
+if [[ ! -v "_boost_pkgver" ]]; then
+  _boost_pkgver="$(
+    pacman \
+      -Qi \
+        "boost-libs" |
+      grep \
+        "Version" |
+        awk \
+          '{print $3}' |
+          rev |
+            cut \
+              -d \
+                "-" \
+              -f \
+                "1" \
+              --complement |
+              rev || \
+    echo \
+      "null")"
+fi
 if [[ ! -v "_git" ]]; then
   _git="false"
 fi
@@ -233,9 +235,15 @@ conflicts=(
   "${_pkg}-git"
 )
 if [[ "${_git}" == "false" ]]; then
-  _tag="${pkgver}"
-  _tag_name="pkgver"
-  _tarname="${_pkg}_${_tag}"
+  if [[ "${_boost_oldest}" == "1.89" ]]; then
+    _tag="${_commit}"
+    _tag_name="commit"
+    _tarname="${_pkg}-${_tag}"
+  elif [[ "${_boost_oldest}" != "1.89" ]]; then
+    _tag="${pkgver}"
+    _tag_name="pkgver"
+    _tarname="${_pkg}_${_tag}"
+  fi
 elif [[ "${_git}" == "true" ]]; then
   _tag="${_commit}"
   _tag_name="commit"
@@ -292,12 +300,12 @@ if [[ "${_evmfs}" == "true" ]]; then
   fi
 elif [[ "${_evmfs}" == "false" ]]; then
   if [[ "${_git}" == true ]]; then
-    _src="${_tarname}::git+${_url}#${_tag_name}=${_tag}?signed"
+    _src="${_tarname}::git+${url}#${_tag_name}=${_tag}?signed"
     _sum="SKIP"
   elif [[ "${_git}" == false ]]; then
     if [[ "${_git_service}" == "github" ]]; then
       if [[ "${_tag_name}" == "commit" ]]; then
-        _uri="${_url}/archive/${_commit}.${_archive_format}"
+        _uri="${url}/archive/${_commit}.${_archive_format}"
         _sum="SKIP"
       elif [[ "${_tag_name}" == "pkgver" ]]; then
         _uri="${url}/releases/download/v${pkgver}/${_pkg}_${pkgver}.tar.gz"
