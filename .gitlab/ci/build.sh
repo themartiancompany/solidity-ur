@@ -134,6 +134,31 @@ _fur_mini() {
     "${_tmp_dir}/fur"
 }
 
+_check_tag_latest() {
+  local \
+    _pkgname="${1}" \
+    _msg=() \
+    _tag
+  _tag="$(
+    git \
+      -C \
+        "/home/user/${_pkgname}"
+      tag |
+      tail \
+        -n \
+          1)"
+  if [[ "${_tag}" != "${tag}" ]]; then
+    _msg=(
+      "Current build tag '${tag}',"
+      "latest tag '${_tag}'."
+    )
+  fi
+  echo \
+    "${_msg[*]}"
+  exit \
+    0
+}
+
 _requirements() {
   local \
     _fur_mini_opts=() \
@@ -160,6 +185,8 @@ _requirements() {
     _python_aioetherscan_release_latest \
     _python_aiohttp_retry_release_latest
   _pkgname="${pkg%-ur}"
+  _check_tag_latest \
+    "${_pkgname}"
   _fur_mini_opts+=(
     "${platform}"
   )
