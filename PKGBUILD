@@ -152,7 +152,7 @@ pkgver="0.8.30"
 _commit="73712a01b2de56d9ad91e3b6936f85c90cb7de36"
 _bundle_commit="142aa62e6805505b6a06cbeeec530f5c8bf0bfdd"
 _0_8_30_1_commit="8b8767a80b768e2ca75386f4ce224c15f77dc286"
-pkgrel=33
+pkgrel=34
 pkgdesc="Smart contract programming language."
 arch=(
   "x86_64"
@@ -263,8 +263,39 @@ _bundle_sum="77860b58f9d6c4a9a9cb1ceaae7ebe5d856f91f3ccd96f67d5ea6a019d79d1fb"
 _bundle_sig_sum="7f737e7a88fdb8e96b428974592def4bbdf5bf24656b12ac5af76084b7fca095"
 _0_8_30_1_sum="ee1e8be598e10ab639454e3cfe7cde53b6573afc297ce72a9cae12c569cd0051"
 _0_8_30_1_sig_sum="7c36822399acda42434958d07ab6fcfbff45a2f654bc06edeed046c362e9e186"
+_github_sum="SKIP"
+_github_sig_sum="SKIP"
+_gitlab_sum="SKIP"
+_gitlab_sig_sum="SKIP"
 _github_release_sum="5e8d58dff551a18205e325c22f1a3b194058efbdc128853afd75d31b0568216d"
 _github_release_sha512_sum="b08733619a4c1398a2b80d0fec83d56b3769af8dfa01a028c71ff89985f5c93d12c3c7d8bbcec29bb0816a9cc1d56bb099010e59a203bcf917b87ff1b0cf0241"
+if [[ "${_evmfs}" == "true" ]]; then
+  if [[ "${_git}" == "true" ]]; then
+    _sum="${_bundle_sum}"
+    _sig_sum="${_bundle_sig_sum}"
+  elif [[ "${_git}" == "false" ]]; then
+    if [[ "${_git_service}" == "github" ]]; then
+      _sum="${_github_sum}"
+      _sig_sum="${_github_sig_sum}"
+    elif [[ "${_git_service}" == "gitlab" ]]; then
+      _sum="${_gitlab_sum}"
+      _sig_sum="${_gitlab_sig_sum}"
+    fi
+  fi
+elif [[ "${_evmfs}" == "false" ]]; then
+  if [[ "${_git}" == "true" ]]; then
+    _sum="SKIP"
+    _sig_sum="SKIP"
+  elif [[ "${_git}" == "false" ]]; then
+    if [[ "${_git_service}" == "github" ]]; then
+      _sum="${_github_sum}"
+      _sig_sum="${_github_sig_sum}"
+      elif [[ "${_git_service}" == "gitlab" ]]; then
+        _sum="${_gitlab_sum}"
+        _sig_sum="${_gitlab_sig_sum}"
+    fi
+  fi
+fi
 # Dvorak
 _evmfs_ns="0x87003Bd6C074C713783df04f36517451fF34CBEf"
 _kid_ns="0x926acb6aA4790ff678848A9F1C59E578B148C786"
@@ -286,6 +317,7 @@ if [[ "${_evmfs}" == "true" ]]; then
       "${_like}"
     )
     _src=""
+    _sum=""
   elif [[ "${_git}" == "false" ]]; then
     _src="${_evmfs_src}"
     _sum="${_bundle_sum}"
@@ -324,7 +356,7 @@ elif [[ "${_evmfs}" == "false" ]]; then
       fi
     elif [[ "${_git_service}" == "gitlab" ]]; then
       if [[ "${_tag_name}" == "commit" ]]; then
-        _uri="${_url}/-/archive/${_tag}/${_tag}.${_archive_format}"
+        _uri="${url}/-/archive/${_tag}/${_tag}.${_archive_format}"
       fi
     fi
     _src="${_tarfile}::${_uri}"
