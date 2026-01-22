@@ -427,9 +427,10 @@ _build() {
       )
     fi
   fi
-  for _depend in $(recipe-get \
-                     "${_pkgbuild}" \
-        "makedepends"); do
+  for _depend \
+    in $(recipe-get \
+           "${_pkgbuild}" \
+           "makedepends"); do
     _resolve_flag="false"
     _depend_target="${_depend}"
     for _sep in "${_separators[@]}"; do
