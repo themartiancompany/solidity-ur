@@ -162,11 +162,11 @@ _check_tag_latest() {
       "Current build tag '${tag}',"
       "latest tag '${_tag}'."
     )
+    echo \
+      "${_msg[*]}"
+    exit \
+      0
   fi
-  echo \
-    "${_msg[*]}"
-  exit \
-    0
 }
 
 _requirements() {
