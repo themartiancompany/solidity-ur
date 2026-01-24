@@ -113,6 +113,27 @@ _boost_oldest="$(
       head \
         -n \
           1)"
+# In late 2025 or 2026, according
+# to Github, Solidity publishing
+# namespace seems to have been moved
+# moved from 'ethereum' to 'argotorg'
+# _ns="ethereum"
+# Despite this, Solidity 0.8.30 requires
+# changes to be built with Boost versions
+# later than 1.83 which are only published
+# on The Martian Company namespaces.
+if [[ ! -v "_ns" ]]; then
+  if [[ "${_boost_oldest}" == "1.89" ]]; then
+    _ns="themartiancompany"
+    if [[ "${_evmfs}" == "true" ]]; then
+    _commit="${_bundle_commit}"
+    elif [[ "${_evmfs}" == "false" ]]; then
+      _commit="${_0_8_30_1_commit}"
+    fi
+  elif [[ "${_boost_oldest}" != "1.89" ]]; then
+    _ns="argotorg"
+  fi
+fi
 if [[ ! -v "_git" ]]; then
   _git="false"
 fi
@@ -166,25 +187,6 @@ arch=(
   "pentium4"
 )
 _http="https://${_git_service}.com"
-# In late 2025 or 2026, according
-# to Github, Solidity publishing
-# namespace seems to have been moved
-# moved from 'ethereum' to 'argotorg'
-# _ns="ethereum"
-# Despite this, Solidity 0.8.30 requires
-# changes to be built with Boost versions
-# later than 1.83 which are only published
-# on The Martian Company namespaces.
-if [[ "${_boost_oldest}" == "1.89" ]]; then
-  _ns="themartiancompany"
-  if [[ "${_evmfs}" == "true" ]]; then
-  _commit="${_bundle_commit}"
-  elif [[ "${_evmfs}" == "false" ]]; then
-    _commit="${_0_8_30_1_commit}"
-  fi
-elif [[ "${_boost_oldest}" != "1.89" ]]; then
-  _ns="argotorg"
-fi
 url="${_http}/${_ns}/${_pkg}"
 license=(
   "GPL-3.0-or-later"
