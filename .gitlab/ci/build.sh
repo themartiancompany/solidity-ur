@@ -356,20 +356,20 @@ _requirements() {
       "_git_http" || \
       true)"
   # ohoh
-  # if [[ "${_git_http}" == "gitlab" ]]; then
-  #   _commit="$(
-  #     recipe-get \
-  #       "/home/user/${_pkgname}/PKGBUILD" \
-  #       "_commit")"
-  #   _gl_dl_mini \
-  #     "${ns}" \
-  #     "${_pkgname}" \
-  #     "${_commit}"
-  #   mv \
-  #     "${HOME}/${_pkgname}-${_commit}.tar.gz" \
-  #     "/home/user/${_pkgname}"
-  # fi || \
-  # true
+  if [[ "${_git_http}" == "gitlab" ]]; then
+    _commit="$(
+      recipe-get \
+        "/home/user/${_pkgname}/PKGBUILD" \
+        "_commit")"
+    _gl_dl_mini \
+      "${ns}" \
+      "${_pkgname}" \
+      "${_commit}"
+    mv \
+      "${HOME}/${_pkgname}-${_commit}.tar.gz" \
+      "/home/user/${_pkgname}"
+  fi || \
+  true
 }
 
 _build() {
