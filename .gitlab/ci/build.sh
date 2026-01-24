@@ -404,9 +404,14 @@ _build() {
   _pkgname="${pkg%-ur}"
   _work_dir="${_home}/${_pkgname}-build"
   _pkgbuild="${_home}/${_pkgname}/PKGBUILD"
-  mount  |
-    grep \
-      "${_home}/ramdisk"
+  _ramdisk_enabled="$(
+    mount |
+      grep \
+        "${_home}/ramdisk" || \
+      true)"
+  if [[ "${_ramdisk_enabled}" != "" ]]; then
+    _work_dir="${_home}/ramdisk/${_pkgname}-build"
+  fi
   _reallymakepkg_opts+=(
     -v
     -w
