@@ -90,8 +90,6 @@ _upload() {
     _pkgname \
     _something_found
   _pkgname="${pkg%-ur}"
-  pwd
-  ls
   _something_found="false"
   for _file \
     in $(find \
@@ -104,7 +102,7 @@ _upload() {
              "dogeos-*.pkg.tar.*"); do
     _url="${package_registry_url}/${_pkgname}/${tag}/${_file}"
     _gl_dl_upload \
-      "$(pwd)/${_file}" \
+      "${_file}" \
       "${_url}"
     _asset_link="{$(
       printf \
