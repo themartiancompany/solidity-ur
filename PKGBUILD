@@ -474,12 +474,13 @@ prepare() {
       fi
     fi
   fi
-  if [[ "${_git}" == "true" ]]; then
+  if [[ ! -e "${srcdir}/${_tarname}/commit_hash.txt" ]]; then
     _commit_hash="${_0_8_30_commit:0:8}"    
+    echo \
+      "${_commit_hash}" > \
+      "${srcdir}/${_tarname}/commit_hash.txt"
+
   fi
-  echo \
-    "${_commit_hash}" > \
-    "${srcdir}/${_tarname}/commit_hash.txt"
 }
 
 _bin_get() {
