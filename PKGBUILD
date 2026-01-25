@@ -166,7 +166,7 @@ pkgver="0.8.30"
 _commit="73712a01b2de56d9ad91e3b6936f85c90cb7de36"
 _bundle_commit="142aa62e6805505b6a06cbeeec530f5c8bf0bfdd"
 _0_8_30_1_commit="8b8767a80b768e2ca75386f4ce224c15f77dc286"
-pkgrel=43
+pkgrel=44
 pkgdesc="Smart contract programming language."
 arch=(
   "x86_64"
@@ -368,7 +368,7 @@ elif [[ "${_evmfs}" == "false" ]]; then
         _uri="${url}/archive/${_commit}.${_archive_format}"
         _sum="SKIP"
       elif [[ "${_tag_name}" == "pkgver" ]]; then
-        _uri="${url}/releases/download/v${pkgver}/${_pkg}_${pkgver}.tar.gz"
+        _uri="${url}/releases/download/v${pkgver}/${_tarname}.tar.gz"
 	_sum="${_github_release_sum}"
         sha512sums=(
           "${_github_release_sha512_sum}"
@@ -545,7 +545,7 @@ _compile() {
     # -D
     #   USE_SYSTEM_LIBRARIES="OFF"
     -S
-      "${srcdir}/${_pkg}_${pkgver}/"
+      "${srcdir}/${_tarname}/"
     -Wno-dev
   )
   export \
@@ -555,13 +555,13 @@ _compile() {
   CXX="${_cxx}" \
   cmake \
     -B \
-      "${srcdir}/${_pkg}_${pkgver}/build/" \
+      "${srcdir}/${_tarname}/build/" \
     "${_cmake_opts[@]}"
   CC="${_cc}" \
   CXX="${_cxx}" \
   cmake \
     --build \
-      "${srcdir}/${_pkg}_${pkgver}/build/" \
+      "${srcdir}/${_tarname}/build/" \
     2>&1 > \
     "${srcdir}/build.log"
 }
@@ -587,11 +587,11 @@ check()
 {
   _compile \
     "ON"
-  "${srcdir}/${_pkg}_${pkgver}/build/test/soltest" \
+  "${srcdir}/${_tarname}/build/test/soltest" \
     -p \
       true -- \
     --testpath \
-      "${srcdir}/${_pkg}_${pkgver}/test/"
+      "${srcdir}/${_tarname}/test/"
   _compile \
     "OFF"
 }
@@ -610,7 +610,7 @@ package_solidity() {
   DESTDIR="${pkgdir}/" \
   cmake \
     --install \
-      "${srcdir}/${_pkg}_${pkgver}/build/"
+      "${srcdir}/${_tarname}/build/"
   # Set version link
   ln \
     -s \
@@ -619,11 +619,11 @@ package_solidity() {
   # Install the documentation.
   install \
     -Dm644 \
-    "${srcdir}/${_pkg}_${pkgver}/README.md" \
+    "${srcdir}/${_tarname}/README.md" \
     "${pkgdir}/usr/share/doc/${_pkg}/"
   cp \
     -r \
-    "${srcdir}/${_pkg}_${pkgver}/docs/"* \
+    "${srcdir}/${_tarname}/docs/"* \
     "${pkgdir}/usr/share/doc/${_pkg}/"
   find \
     "${pkgdir}/usr/share/doc/${_pkg}/" \
