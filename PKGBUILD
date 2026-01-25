@@ -102,12 +102,13 @@ if [[ ! -v "_boost_pkgver" ]]; then
               rev || \
     echo \
       "null")"
+  _boost_majver="${_boost_pkgver%.*}"
 fi
 _boost_oldest="$(
   printf \
     "%s\n%s" \
     "1.89" \
-    "${_boost_pkgver}" |
+    "${_boost_majver}" |
     sort \
       -V |
       head \
@@ -159,7 +160,7 @@ pkgver="0.8.30"
 _commit="73712a01b2de56d9ad91e3b6936f85c90cb7de36"
 _bundle_commit="142aa62e6805505b6a06cbeeec530f5c8bf0bfdd"
 _0_8_30_1_commit="8b8767a80b768e2ca75386f4ce224c15f77dc286"
-pkgrel=39
+pkgrel=40
 pkgdesc="Smart contract programming language."
 arch=(
   "x86_64"
