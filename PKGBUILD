@@ -513,7 +513,7 @@ _compile() {
       -v \
       "${_cxx_compiler}")"
   _cmake_opts=(
-    --trace-expand 
+    # --trace-expand 
     # -G
     #   "Ninja"
     -D
