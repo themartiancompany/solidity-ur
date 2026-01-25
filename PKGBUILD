@@ -123,6 +123,13 @@ if [[ ! -v "_git_service" ]]; then
     _git_service="github"
   fi
 fi
+if [[ ! -v "_git_http" ]]; then
+  if [[ "${_git_service}" == "gitlab" ]]; then
+    _git_http="${_git_service}"
+  elif [[ "${_git_service}" == "github" ]]; then
+    _git_http="${_git_service}"
+  fi
+fi
 if [[ "${_os}" == "Android" ]]; then
   _compiler="clang"
 elif [[ "${_os}" == "GNU/Linux" ]]; then
@@ -152,7 +159,7 @@ pkgver="0.8.30"
 _commit="73712a01b2de56d9ad91e3b6936f85c90cb7de36"
 _bundle_commit="142aa62e6805505b6a06cbeeec530f5c8bf0bfdd"
 _0_8_30_1_commit="8b8767a80b768e2ca75386f4ce224c15f77dc286"
-pkgrel=37
+pkgrel=38
 pkgdesc="Smart contract programming language."
 arch=(
   "x86_64"
@@ -186,7 +193,7 @@ if [[ ! -v "_ns" ]]; then
     _ns="argotorg"
   fi
 fi
-_http="https://${_git_service}.com"
+_http="https://${_git_http}.com"
 url="${_http}/${_ns}/${_pkg}"
 license=(
   "GPL-3.0-or-later"
