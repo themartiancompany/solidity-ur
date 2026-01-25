@@ -139,23 +139,29 @@ _check_tag_latest() {
     _pkgname="${1}" \
     _msg=() \
     _tag \
-    _tag_recipe
+    _tag_recipe \
+    _repo_dir
+  _repo_dir="/home/user/${_pkgname}"
   git \
     config \
       --global \
       --add \
         "safe.directory" \
-        "/home/user/${_pkgname}"
+        "${_repo_dir}"
   _tag="$(
     git \
       -C \
-        "/home/user/${_pkgname}" \
+        "${_repo_dir}" \
       tag |
       tail \
         -n \
           1)"
   if [[ "${_tag}" == "[MASKED]" ]]; then
-    _tag_recipe="$()"
+    _tag_recipe="$(
+      recipe-get \
+        "${_repo_dir}/PKGBUILD" \
+        "pkgver" || \
+        true)"
   fi
   if [[ "${_tag}" != "${tag}" ]]; then
     _msg=(
