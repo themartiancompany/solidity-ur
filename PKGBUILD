@@ -610,12 +610,16 @@ _compile() {
     CC="${_cc}" \
     CXX="${_cxx}" \
     CXXFLAGS="${_cxxflags[*]}"
-  ${_flags[@]} \
+  CC="${_cc}" \
+  CXX="${_cxx}" \
+  CXXFLAGS="${_cxxflags[*]}" \
   cmake \
     -B \
       "${srcdir}/${_tarname}/build/" \
     "${_cmake_opts[@]}"
-  ${_flags[@]} \
+  CC="${_cc}" \
+  CXX="${_cxx}" \
+  CXXFLAGS="${_cxxflags[*]}" \
   cmake \
     --build \
       "${srcdir}/${_tarname}/build/" # \
