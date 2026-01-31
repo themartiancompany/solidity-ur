@@ -2,7 +2,7 @@
       
 
 #    ----------------------------------------------------------------------
-#    Copyright © 2024, 2025  Pellegrino Prevete
+#    Copyright © 2024, 2025, 2026  Pellegrino Prevete
 #
 #    All rights reserved
 #    ----------------------------------------------------------------------
@@ -223,7 +223,7 @@ optdepends=(
 )
 makedepends=(
   "boost"
-  "cmake3"
+  "cmake>3.10"
   "${_compiler}"
   "${_cmake_generator}"
   "fmt"
