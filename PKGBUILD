@@ -536,11 +536,25 @@ _compile() {
     _cmake_opts=() \
     _cc \
     _cxx \
-    _cxx_compiler
+    _cxx_compiler \
+    _cxxflags=() \
+    _flags=()
   _cc="$(
     command \
       -v \
       "${_compiler}")"
+  _cxxflags=(
+    "${CXXFLAGS}"
+  )
+  if [[ "${_os}" == "Android" ]]; then
+    _cxxflags+=(
+      -Wno-unused-but-set-variable
+    )
+  fi
+  if [[ "${_boost_oldest}" != "1.89" ]]; then
+      _cxxflags+=(
+        -Wno-deprecated-declarations
+      )
   if [[ "${_compiler}" == "gcc" ]]; then
     _cxx_compiler="g++"
   elif [[ "${_compiler}" == "clang" ]]; then
@@ -586,17 +600,19 @@ _compile() {
       "${srcdir}/${_tarname}/"
     -Wno-dev
   )
-  export \
-    CC="${_cc}" \
+  _flags+=(
+    CC="${_cc}"
     CXX="${_cxx}"
-  CC="${_cc}" \
-  CXX="${_cxx}" \
+    CXXFLAGS="${_cxxflags[*]}"
+  )
+  export \
+    ${_flags[@]}
+  ${_flags[@]} \
   cmake \
     -B \
       "${srcdir}/${_tarname}/build/" \
     "${_cmake_opts[@]}"
-  CC="${_cc}" \
-  CXX="${_cxx}" \
+  ${_flags[@]} \
   cmake \
     --build \
       "${srcdir}/${_tarname}/build/" # \
