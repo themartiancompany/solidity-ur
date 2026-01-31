@@ -1,5 +1,4 @@
 # SPDX-License-Identifier: AGPL-3.0
-      
 
 #    ----------------------------------------------------------------------
 #    Copyright © 2024, 2025, 2026  Pellegrino Prevete
@@ -80,34 +79,55 @@ if [[ ! -v "_like" ]]; then
     _like="never-gonna-give-you-up"
   fi
 fi
-if [[ ! -v "_boost_pkgver" ]]; then
-  _boost_pkgver="$(
-    ( pacman \
-        -Qi \
-        "boost-libs" || 
-     pacman \
-       -Si \
-       "boost-libs" || \
-      pacman \
-        -Qi \
-        "boost" || \
-      pacman \
-        -Si \
-	"boost" ) |
-      grep \
-        "Version" |
-        awk \
-          '{print $3}' |
-          rev |
-            cut \
-              -d \
-                "-" \
-              -f \
-                "1" \
-              --complement |
+
+_boost_pkgver_get() {
+  local \
+    _modes=() \
+    _pkgs=() \
+    _cut_opts=()
+  _modes+=(
+    "Q"
+    "S"
+  )
+  _pkgs+=(
+    "boost-libs"
+    "boost"
+  )
+  _cut_opts=(
+    -d
+      "-"
+    -f
+      "1"
+    --complement
+  )
+  for _pkg in "${_pkgs[@]}"; do
+    for _mode in "${_modes[@]}"; do
+      _boost_pkgver="$(
+        ( pacman \
+            -"${_mode}"i \
+            "${_pkg}" \
+            2>"/dev/null" || \
+          true ) |
+          grep \
+            "Version" |
+            awk \
+              '{print $3}' |
+              rev |
+                cut \
+                  "${_cut_opts[@]}" |
               rev || \
-    echo \
-      "null")"
+        echo \
+          "null")"
+      if [[ "${_boost_pkgver}" != "" && \
+            "${_boost_pkgver}" != "null" ]]; then
+        break
+      fi
+    done
+  done
+}
+
+if [[ ! -v "_boost_pkgver" ]]; then
+  _boost_pkgver_get
 fi
 _boost_majver="${_boost_pkgver%.*}"
 _boost_oldest="$(
@@ -121,7 +141,7 @@ _boost_oldest="$(
         -n \
           1)"
 if [[ ! -v "_git" ]]; then
-  _git="false"
+  _git="${_evmfs}"
 fi
 if [[ ! -v "_git_service" ]]; then
   if [[ "${_boost_oldest}" == "1.89" ]]; then
@@ -158,15 +178,15 @@ if [[ ! -v "_archive_format" ]]; then
   fi
 fi
 _pkg=solidity
+pkgver="0.8.30"
 pkgbase="${_pkg}"
-pkgname+=(
+pkgname=(
   "${_pkg}"
 )
-pkgver="0.8.30"
 _0_8_30_commit="73712a01b2de56d9ad91e3b6936f85c90cb7de36"
 _bundle_commit="142aa62e6805505b6a06cbeeec530f5c8bf0bfdd"
 _0_8_30_1_commit="8b8767a80b768e2ca75386f4ce224c15f77dc286"
-pkgrel=52
+pkgrel=53
 pkgdesc="Smart contract programming language."
 arch=(
   "x86_64"
@@ -182,9 +202,9 @@ arch=(
 # In late 2025 or 2026, according
 # to Github, Solidity publishing
 # namespace seems to have been moved
-# moved from 'ethereum' to 'argotorg'
+# from 'ethereum' to 'argotorg'
 # _ns="ethereum"
-# Despite this, Solidity 0.8.30 requires
+# Despite this, most Solidity versions requires
 # changes to be built with Boost versions
 # later than 1.83 which are only published
 # on The Martian Company namespaces.
@@ -195,7 +215,9 @@ if [[ ! -v "_ns" ]]; then
     _ns="argotorg"
   fi
 fi
-if [[ "${_ns}" == "themartiancompany" ]]; then
+if [[ "${_ns}" == "argotorg" ]]; then
+  _commit="${_0_8_30_commit}"
+else
   if [[ "${_boost_oldest}" == "1.89" ]]; then
     if [[ "${_evmfs}" == "true" ]]; then
       _commit="${_bundle_commit}"
@@ -203,16 +225,27 @@ if [[ "${_ns}" == "themartiancompany" ]]; then
       _commit="${_0_8_30_1_commit}"
     fi
   fi
-elif [[ "${_ns}" == "argotorg" ]]; then
-  _commit="${_0_8_30_commit}"
 fi
 _http="https://${_git_http}.com"
 url="${_http}/${_ns}/${_pkg}"
 license=(
   "GPL-3.0-or-later"
 )
+depends=()
+_boost_makedepends=(
+  "boost"
+)
+if [[ "${_os}" == "Android" ]]; then
+  _boost_pkgname="boost"
+  _boost_makedepends+=(
+    "boost-headers"
+    "boost-static"
+  )
+elif [[ "${_os}" == "GNU/Linux" ]]; then
+  _boost_pkgname="boost-libs"
+fi
 depends=(
-  "boost-libs"
+  "${_boost_pkgname}"
   "fmt"
   "nlohmann-json"
   "range-v3"
@@ -222,7 +255,7 @@ optdepends=(
   "z3: SMT checker"
 )
 makedepends=(
-  "boost"
+  "${_boost_makedepends[@]}"
   "cmake>3.10"
   "${_compiler}"
   "${_cmake_generator}"
@@ -230,12 +263,6 @@ makedepends=(
   "nlohmann-json"
   "range-v3"
 )
-if [[ "${_os}" == "Android" ]]; then
-  makedepends+=(
-    "boost-headers"
-    "boost-static"
-  )
-fi
 if [[ "${_git}" == "true" ]]; then
   makedepends+=(
     "git"
@@ -340,7 +367,7 @@ if [[ "${_evmfs}" == "true" ]]; then
     )
     _src=""
     _sum=""
-  elif [[ "${_git}" == "false" ]]; then
+  elif [[ "${_git}" == "true" ]]; then
     _src="${_evmfs_src}"
     _sum="${_bundle_sum}"
     source+=(
@@ -371,7 +398,7 @@ elif [[ "${_evmfs}" == "false" ]]; then
         _sum="SKIP"
       elif [[ "${_tag_name}" == "pkgver" ]]; then
         _uri="${url}/releases/download/v${pkgver}/${_tarname}.tar.gz"
-	_sum="${_github_release_sum}"
+        _sum="${_github_release_sum}"
         sha512sums=(
           "${_github_release_sha512_sum}"
         )
@@ -384,7 +411,7 @@ elif [[ "${_evmfs}" == "false" ]]; then
     _src="${_tarfile}::${_uri}"
   fi
 fi
-if [[ "${_src}" != "" ]]; then
+if [[ -v "_src" ]]; then
   source+=(
     "${_src}"
   )
