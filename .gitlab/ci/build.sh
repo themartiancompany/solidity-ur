@@ -3,29 +3,37 @@
 # SPDX-License-Identifier: AGPL-3.0
 
 #    ----------------------------------------------------------------------
-#    Copyright © 2022, 2023, 2024, 2025  Pellegrino Prevete
+#    Copyright © 2022, 2023, 2024, 2025, 2026  Pellegrino Prevete
 #
 #    All rights reserved
 #    ----------------------------------------------------------------------
 #
 #    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
-#    (at your option) any later version.
+#    it under the terms of the GNU Affero General Public License as
+#    published by the Free Software Foundation, either version 3 of the
+#    License, or (at your option) any later version.
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU Affero General Public License for more details.
 #
-#    You should have received a copy of the GNU Affero General Public License
-#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#    You should have received a copy of the GNU Affero General Public
+#    License along with this program.
+#    If not, see <https://www.gnu.org/licenses/>.
 
 
 # This script is run within a virtual environment to build
-#  pakcage
+#  package
 # $1: platform
 # $2: architecture
+# $3: namespace
+# $4: package
+# $5: (optional) project-id
+# $6: (optional) commit
+# $7: (optional) tag
+# $8: (optional) ci-job-token
+# $9: (optional) package-registry-url
 
 set \
   -euo \
@@ -39,10 +47,16 @@ _gur_mini() {
     _ns="${1}" \
     _pkg="${2}" \
     _release="${3}" \
+    _depends_skip \
+    _pacman_opts=() \
     _api \
     _url \
     _msg=() \
     _sig
+  _depends_skip="y"
+  if (( 3 < "${#}" )); then
+    _depends_skip="${4}"
+  fi
   _msg=(
     "Downloading '${_pkg}'"
     "binary CI release"
@@ -58,6 +72,16 @@ _gur_mini() {
       "${HOME}/${_ns}%2F${_pkg}-ur" | \
       jq \
         '.id')"
+  if [[ "${_project_id}" == "null" ]]; then
+    _msg=(
+      "The project '${_pkg}-ur' does not exist"
+      "in namespace '${_ns}'."
+    )
+    echo \
+      "${_msg[*]}"
+    return \
+      1
+  fi
   _api="https://gitlab.com/api/v4"
   _url="${_api}/projects/${_project_id}/releases"
   _gl_dl_retrieve \
@@ -87,9 +111,19 @@ _gur_mini() {
   rm \
     -rf \
     "${HOME}/"*".pkg.tar.xz.sig"
+  _pacman_opts+=(
+    -U
+  )
+  if [[ "${_depends_skip}" == "y" ]]; then
+    _pacman_opts+=(
+      -dd
+    )
+  fi
+  _pacman_opts+=(
+    --noconfirm
+  )
   pacman \
-    -Udd \
-    --noconfirm \
+    "${_pacman_opts[@]}" \
     "${HOME}/"*".pkg.tar.xz"
 }
 
@@ -242,7 +276,7 @@ _requirements() {
   _evm_wallet_release_latest="0.0.0.0.0.0.0.0.0.0.1.1.1-6"
   _fur_release_latest="1.0.0.0.0.0.0.0.0.0.1.1-2"
   _gl_dl_release_latest="0.0.0.0.0.0.0.0.0.0.0.0.1.1.1.1.1.1-5"
-  _gur_release_latest="0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.1-3"
+  _gur_release_latest="0.0.0.0.0.0.0.0.0.0.0.0.0.0.1.1-5"
   _key_gen_release_latest="0.0.0.0.0.0.0.0.0.0.0.1-5"
   _libcrash_bash_release_latest="0.0.0.0.0.1.1.1.1.1-11"
   _libcrash_js_release_latest="0.1.69-25"
@@ -379,7 +413,8 @@ _requirements() {
       "${_commit}"
     mv \
       "${HOME}/${_pkgname}-${_commit}.tar.gz" \
-      "/home/user/${_pkgname}"
+      "/home/user/${_pkgname}" || \
+    true
   fi || \
   true
 }
@@ -423,6 +458,12 @@ _build() {
       true)"
   if [[ "${_ramdisk_enabled}" != "" ]]; then
     _work_dir="${_home}/ramdisk/${_pkgname}-build"
+  else
+    _msg=(
+      "[build.sh][WARNING] Ramdisk disabled."
+    )
+    echo \
+      "${_msg[*]}"
   fi
   _reallymakepkg_opts+=(
     -v
@@ -682,6 +723,29 @@ _gl_dl_retrieve() {
     "${_url}"
 }
 
+_mem_free_get() {
+  free | \
+    grep \
+      "Mem:" | \
+    awk \
+      '{print $4}'
+}
+
+_show_config() {
+  _mem_free="$(
+    _mem_free_get)"
+  echo \
+    "Free memory: '${_mem_free}'"
+  mount | \
+    grep \
+      "/home/user/ramdisk"
+  inxi \
+    -e
+  du \
+    -hs \
+      /usr
+}
+
 readonly \
   platform="${1}" \
   arch="${2}" \
@@ -702,6 +766,7 @@ if (( 8 < "${#}" )); then
 fi
 
 _requirements
+_show_config
 _build
 
 # vim:set sw=2 sts=-1 et:
