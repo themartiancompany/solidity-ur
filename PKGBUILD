@@ -177,9 +177,9 @@ _boost_oldest="$(
 # and with versions greater than 1.88
 # it requires version 0.5.16.2
 if [[ ! -v "_ns" ]]; then
-  if [[ "${_boost_16}" == "true" ]]; then
+  if [[ "${_boost_oldest}" != "1.89" ]]; then
     _ns="argotorg"
-  else
+  elif [[ "${_boost_oldest}" == "1.89" ]]; then
     _ns="themartiancompany"
   fi
 fi
