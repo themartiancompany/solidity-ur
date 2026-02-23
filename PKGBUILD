@@ -553,7 +553,7 @@ _git_unbundle_update() {
       remote \
         add \
           "${_bundle_name}" \
-	  "${_bundle}" ||
+          "${_bundle}" ||
   true
   git \
     -C \
@@ -585,7 +585,6 @@ prepare() {
     echo \
       "${_commit_hash}" > \
       "${srcdir}/${_tarname}/commit_hash.txt"
-
   fi
 }
 
@@ -655,7 +654,7 @@ _compile() {
         awk \
           '{print $3}')"
   _msg=(
-    "CMake version '${_cmake_version}'.
+    "CMake version '${_cmake_version}'."
   )
   echo \
     "${_msg[*]}"
