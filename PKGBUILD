@@ -1,14 +1,16 @@
 # SPDX-License-Identifier: AGPL-3.0
 
-#    ----------------------------------------------------------------------
-#    Copyright © 2024, 2025, 2026  Pellegrino Prevete
+#    ---------------------------------------------------------------
+#    Copyright © 2024, 2025, 2026
+#              Pellegrino Prevete
 #
 #    All rights reserved
-#    ----------------------------------------------------------------------
+#    ---------------------------------------------------------------
 #
-#    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as published by
-#    the Free Software Foundation, either version 3 of the License, or
+#    This program is free software: you can redistribute it
+#    and/or modify it under the terms of the GNU Affero
+#    General Public License as published by the Free Software
+#    Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
 #    This program is distributed in the hope that it will be useful,
@@ -16,8 +18,9 @@
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU Affero General Public License for more details.
 #
-#    You should have received a copy of the GNU Affero General Public License
-#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#    You should have received a copy of the GNU Affero General
+#    Public License along with this program.
+#    If not, see <https://www.gnu.org/licenses/>.
 
 # Maintainers:
 #   Truocolo
@@ -51,14 +54,18 @@ if [[ ! -v "_evmfs" ]]; then
     _evmfs="false"
   fi
 fi
-_locale="$(
-  locale |
-    grep \
-      "LANG=" |
-      awk \
-        -F \
-          "=" \
-        '{print $1}')"
+if [[ "${_os}" == "Android" ]]; then
+  _locale="C.UTF-8"
+else
+  _locale="$(
+    locale |
+      grep \
+        "LANG=" |
+        awk \
+          -F \
+            "=" \
+          '{print $1}')"
+fi
 if [[ ! -v "_en" ]]; then
   _en="true"
   if [[ "${_locale}" == "C.UTF-8" ]]; then
@@ -126,6 +133,22 @@ _boost_pkgver_get() {
   done
 }
 
+_verlte() {
+  printf \
+    '%s\n' \
+    "${1}" \
+    "${2}" |
+    sort \
+      -C \
+      -V
+}
+
+_verlt() {
+  ! _verlte \
+      "${2}" \
+      "${1}"
+}
+
 if [[ ! -v "_boost_pkgver" ]]; then
   _boost_pkgver_get
 fi
@@ -140,6 +163,29 @@ _boost_oldest="$(
       head \
         -n \
           1)"
+# In late 2025 or 2026, according
+# to Github, Solidity publishing
+# namespace seems to have been moved
+# from 'ethereum' to 'argotorg'
+# _ns="ethereum"
+# Solidity 0.5.x requires
+# a different patchset depending
+# on the Boost version its built with
+# With Boost lesser than 1.70
+# it requires no extra patches, with boost
+# up to 1.83 it requires version 0.5.16.1
+# and with versions greater than 1.88
+# it requires version 0.5.16.2
+if [[ ! -v "_ns" ]]; then
+  if [[ "${_boost_16}" == "true" ]]; then
+    _ns="argotorg"
+  else
+    _ns="themartiancompany"
+  fi
+fi
+if [[ ! -v "_debug" ]]; then
+  _debug="true"
+fi
 if [[ ! -v "_git" ]]; then
   _git="${_evmfs}"
 fi
@@ -166,6 +212,33 @@ if [[ ! -v "_cmake_generator" ]]; then
   _cmake_generator="make"
   # _cmake_generator="ninja"
 fi
+_cmake_available="$(
+  command \
+    -v \
+    "cmake" || \
+  true)"
+if [[ "${_cmake_available}" != "" ]]; then
+  _cmake_version="$(
+    cmake \
+      --version |
+      head \
+        -n \
+          1 |
+        awk \
+          '{print $3}')"
+else
+  _cmake_version="4."
+fi
+if [[ "${_cmake_version}" == "4."* ]]; then
+  _cmake3="false"
+  _cmake4="true"
+elif [[ "${_cmake_version}" == "3."* ]]; then
+  _cmake3="true"
+  _cmake4="false"
+fi
+if [[ ! -v "_static" ]]; then
+  _static="false"
+fi
 if [[ ! -v "_archive_format" ]]; then
   if [[ "${_git}" == "true" ]]; then
     if [[ "${_evmfs}" == "true" ]]; then
@@ -178,14 +251,14 @@ if [[ ! -v "_archive_format" ]]; then
   fi
 fi
 _pkg=solidity
-pkgver="0.8.30"
+_0_8_30_commit="73712a01b2de56d9ad91e3b6936f85c90cb7de36"
+_bundle_commit="142aa62e6805505b6a06cbeeec530f5c8bf0bfdd"
+_0_8_30_1_commit="8b8767a80b768e2ca75386f4ce224c15f77dc286"
+pkgver=0.8.30
 pkgbase="${_pkg}"
 pkgname=(
   "${_pkg}"
 )
-_0_8_30_commit="73712a01b2de56d9ad91e3b6936f85c90cb7de36"
-_bundle_commit="142aa62e6805505b6a06cbeeec530f5c8bf0bfdd"
-_0_8_30_1_commit="8b8767a80b768e2ca75386f4ce224c15f77dc286"
 pkgrel=61
 pkgdesc="Smart contract programming language."
 arch=(
@@ -199,22 +272,6 @@ arch=(
   "powerpc"
   "pentium4"
 )
-# In late 2025 or 2026, according
-# to Github, Solidity publishing
-# namespace seems to have been moved
-# from 'ethereum' to 'argotorg'
-# _ns="ethereum"
-# Despite this, most Solidity versions requires
-# changes to be built with Boost versions
-# later than 1.83 which are only published
-# on The Martian Company namespaces.
-if [[ ! -v "_ns" ]]; then
-  if [[ "${_boost_oldest}" == "1.89" ]]; then
-    _ns="themartiancompany"
-  elif [[ "${_boost_oldest}" != "1.89" ]]; then
-    _ns="argotorg"
-  fi
-fi
 if [[ "${_ns}" == "argotorg" ]]; then
   _commit="${_0_8_30_commit}"
 else
@@ -228,6 +285,9 @@ else
 fi
 _http="https://${_git_http}.com"
 url="${_http}/${_ns}/${_pkg}"
+_fmtlib_url="${_http}/fmtlib/fmt"
+_json_url="${_http}/nlohmann/json"
+_range_v3_url="${_http}/ericniebler/range-v3"
 license=(
   "GPL-3.0-or-later"
 )
@@ -250,13 +310,19 @@ depends=(
   "nlohmann-json"
   "range-v3"
 )
-optdepends=(
-  "cvc4: SMT checker"
-  "z3: SMT checker"
-)
+if [[ "${_cmake3}" == "true" ]]; then
+  _cmake_makedepends=(
+    "cmake>3.10"
+  )
+else
+  _cmake_makedepends=(
+    "cmake>=4"
+    "patch"
+  )
+fi
 makedepends=(
   "${_boost_makedepends[@]}"
-  "cmake>3.10"
+  "${_cmake_makedepends[@]}"
   "${_compiler}"
   "${_cmake_generator}"
   "fmt"
@@ -281,14 +347,26 @@ group=(
   "hip"
 )
 provides=(
+  "${_pkg}=${pkgver}"
+  "solc${pkgver}=${pkgver}"
   "solc=${pkgver}"
-  "${_pkg}-bin=${pkgver}"
-  "${_pkg}-git=${pkgver}"
 )
 conflicts=(
   "solc"
   "${_pkg}-bin"
   "${_pkg}-git"
+)
+_cvc4_optdepends=(
+  "cvc4:"
+    "SMT checker"
+)
+_z3_optdepends=(
+  "z3:"
+    "SMT checker"
+)
+optdepends=(
+  "${_cvc4_optdepends[*]}"
+  "${_z3_optdepends[*]}"
 )
 if [[ "${_git}" == "false" ]]; then
   if [[ "${_boost_oldest}" == "1.89" ]]; then
@@ -339,15 +417,16 @@ elif [[ "${_evmfs}" == "false" ]]; then
     if [[ "${_git_service}" == "github" ]]; then
       _sum="${_github_sum}"
       _sig_sum="${_github_sig_sum}"
-      elif [[ "${_git_service}" == "gitlab" ]]; then
-        _sum="${_gitlab_sum}"
-        _sig_sum="${_gitlab_sig_sum}"
+    elif [[ "${_git_service}" == "gitlab" ]]; then
+      _sum="${_gitlab_sum}"
+      _sig_sum="${_gitlab_sig_sum}"
     fi
   fi
 fi
 # Dvorak
 _evmfs_ns="0x87003Bd6C074C713783df04f36517451fF34CBEf"
 _kid_ns="0x926acb6aA4790ff678848A9F1C59E578B148C786"
+# Gnosis
 _evmfs_network="100"
 _evmfs_address="0x69470b18f8b8b5f92b48f6199dcb147b4be96571"
 _evmfs_dir="evmfs://${_evmfs_network}/${_evmfs_address}/${_evmfs_ns}"
@@ -534,21 +613,23 @@ _compile() {
   local \
     _tests="${1}" \
     _cmake_opts=() \
+    _cmake_version \
     _cc \
     _cxx \
     _cxx_compiler \
     _cxxflags=() \
-    _flags=()
+    _flags=() \
+    _cmake_static_opt
   _cc="$(
     command \
       -v \
       "${_compiler}")"
   _cxxflags=(
     "${CXXFLAGS}"
+    -Wno-unused-but-set-variable
   )
   if [[ "${_os}" == "Android" ]]; then
     _cxxflags+=(
-      -Wno-unused-but-set-variable
     )
   fi
   if [[ "${_boost_oldest}" != "1.89" ]]; then
@@ -565,6 +646,38 @@ _compile() {
     command \
       -v \
       "${_cxx_compiler}")"
+  _cmake_version="$(
+    cmake \
+      --version | \
+      head \
+        -n \
+          1 |
+        awk \
+          '{print $3}')"
+  _msg=(
+    "CMake version '${_cmake_version}'.
+  )
+  echo \
+    "${_msg[*]}"
+  if [[ "${_cmake_version}" == "4."* ]]; then
+    _cmake_opts+=(
+      -D CMAKE_POLICY_VERSION_MINIMUM=3.5
+    )
+  fi
+  if [[ "${_static}" == "true" ]]; then
+    _cmake_static_opt="ON"
+  elif [[ "${_static}" == "false" ]]; then
+    _cmake_static_opt="OFF"
+  else
+    _msg=(
+      "Unknown value '${_cmake_static_opt}'"
+      "for variable '_cmake_static_opt'."
+    )
+    echo \
+      "${_msg[*]}"
+    exit \
+      1
+  fi
   _cmake_opts=(
     # --trace-expand 
     # -G
@@ -575,14 +688,16 @@ _compile() {
       CMAKE_INSTALL_PREFIX="/usr/"
     -D
       ONLY_BUILD_SOLIDITY_LIBRARIES="OFF"
+    # -D
+    #  CMAKE_VERBOSE_MAKEFILE:BOOL="ON"
     -D
       PEDANTIC="ON"
     -D
       PROFILE_OPTIMIZER_STEPS="OFF"
     -D
-      SOLC_LINK_STATIC="OFF"
+      SOLC_LINK_STATIC="${_cmake_static_opt}"
     -D
-      SOLC_STATIC_STDLIBS="OFF"
+      SOLC_STATIC_STDLIBS="${_cmake_static_opt}"
     -D
       STRICT_NLOHMANN_JSON_VERSION="OFF"
     -D
@@ -591,7 +706,8 @@ _compile() {
       TESTS="${_tests}"
     -D
       USE_LD_GOLD="OFF"
-    # Introduced somewhere after 0.8.28
+    # -D
+    #  Boost_USE_STATIC_LIBS="${_cmake_static_opt}"
     -D
       IGNORE_VENDORED_DEPENDENCIES="ON"
     # Disabled somewhere after 0.8.28
@@ -643,8 +759,7 @@ build() {
   done
 }
 
-check()
-{
+check() {
   _compile \
     "ON"
   "${srcdir}/${_tarname}/build/test/soltest" \
@@ -692,7 +807,7 @@ package_solidity() {
     -exec \
       chmod \
         755 \
-	{} +
+        {} +
   find \
     "${pkgdir}/usr/share/doc/${_pkg}/" \
     -type \
