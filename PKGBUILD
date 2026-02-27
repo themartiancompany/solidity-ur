@@ -688,7 +688,7 @@ _compile() {
     -D
       ONLY_BUILD_SOLIDITY_LIBRARIES="OFF"
     # -D
-    #  CMAKE_VERBOSE_MAKEFILE:BOOL="ON"
+    #   CMAKE_VERBOSE_MAKEFILE:BOOL="ON"
     -D
       PEDANTIC="ON"
     -D
