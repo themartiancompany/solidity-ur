@@ -259,7 +259,7 @@ pkgbase="${_pkg}"
 pkgname=(
   "${_pkg}"
 )
-pkgrel=61
+pkgrel=62
 pkgdesc="Smart contract programming language."
 arch=(
   "x86_64"
@@ -352,8 +352,8 @@ provides=(
   "solc=${pkgver}"
 )
 conflicts=(
-  "solc"
-  "${_pkg}-bin"
+  "solc=${pkgver}"
+  "${_pkg}-bin=${pkgver}"
   "${_pkg}-git"
 )
 _cvc4_optdepends=(
