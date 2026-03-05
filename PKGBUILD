@@ -259,7 +259,7 @@ pkgbase="${_pkg}"
 pkgname=(
   "${_pkg}"
 )
-pkgrel=62
+pkgrel=63
 pkgdesc="Smart contract programming language."
 arch=(
   "x86_64"
@@ -771,11 +771,6 @@ check() {
 }
 
 package_solidity() {
-  conflicts=(
-    "solc"
-    "solidity-bin"
-    "solidity-git"
-  )
   # Assure that the directories exist.
   mkdir \
     -p \

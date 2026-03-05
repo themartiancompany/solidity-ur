@@ -133,7 +133,7 @@ variables:
       echo \
         "Free memory: '${_mem_free}'"
       _ramdisk_size="$(( \
-        "${_mem_free}" / 2000 ))"
+        "${_mem_free}" / 3000 ))"
       mount \
         -o \
           "size=${_ramdisk_size}M" \
@@ -162,14 +162,19 @@ build:
   parallel:
     matrix:
       - BUILD_SCRIPT_ARGS: arch x86_64 ${CI_PROJECT_NAMESPACE} ${CI_PROJECT_NAME} ${CI_PROJECT_ID} ${CI_COMMIT_SHA} ${CI_COMMIT_TAG} ${CI_JOB_TOKEN} ${PACKAGE_REGISTRY_URL}
-  only:
-    refs:
-      - master
-      - merge_requests
-    changes:
-      - PKGBUILD
-      - .gitlab-ci.yml
-      - .gitlab/ci/*
+  rules:
+    - if:
+        $CI_COMMIT_TAG
+      # when:
+      #   manual
+  # only:
+  #   refs:
+  #     - master
+  #     - merge_requests
+  #   changes:
+  #     - PKGBUILD
+  #     - .gitlab-ci.yml
+  #     - .gitlab/ci/*
   interruptible: true
 
 .release:
