@@ -30,9 +30,9 @@ name:
   ci
 run-name:
   Builds Life and DogeOS packages (CI).
-on:
-  [push,
-   pull_request]
+# on:
+#   [push,
+#    pull_request]
 
 jobs:
   # This is what is currently necessary to make termux-docker work with GHA.
