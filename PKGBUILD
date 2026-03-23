@@ -207,6 +207,10 @@ if [[ "${_os}" == "Android" ]]; then
   _compiler="clang"
 elif [[ "${_os}" == "GNU/Linux" ]]; then
   _compiler="gcc"
+elif [[ "${_os}" == "Msys" ]]; then
+  _compiler="gcc"
+else
+  _compiler="gcc"
 fi
 if [[ ! -v "_cmake_generator" ]]; then
   _cmake_generator="make"
@@ -248,7 +252,7 @@ pkgbase="${_pkg}"
 pkgname=(
   "${_pkg}"
 )
-pkgrel=64
+pkgrel=65
 pkgdesc="Smart contract programming language."
 arch=(
   "x86_64"
@@ -322,6 +326,10 @@ if [[ "${_os}" == "Android" ]]; then
     "boost-static"
   )
 elif [[ "${_os}" == "GNU/Linux" ]]; then
+  _boost_pkgname="boost-libs"
+elif [[ "${_os}" == "Msys" ]]; then
+  _boost_pkgname="boost-libs"
+else
   _boost_pkgname="boost-libs"
 fi
 depends=(

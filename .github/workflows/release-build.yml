@@ -1670,9 +1670,15 @@ jobs:
               recipe-get \
                 "PKGBUILD" \
                 "pkgbase")"
+          _evmfs="false" \
+          _git_service="github" \
+          recipe-get \
+            -v \
+            "PKGBUILD" \
+            "pkgbase"
           su \
             -c \
-              "cd ${PWD} && _evmfs="false" _git_service="github" reallymakepkg -v -u -w '/home/user/${_pkgbase}-build' -- -df --nocheck --skippgpcheck && ls -lsh" - \
+              "cd ${PWD} && _evmfs="false" _git="false" _git_service="github" reallymakepkg -v -u -w '/home/user/${_pkgbase}-build' -- -df --nocheck --skippgpcheck && ls -lsh" - \
             "user"
       # - name:
       #     Installs the package.
