@@ -239,17 +239,6 @@ fi
 if [[ ! -v "_static" ]]; then
   _static="false"
 fi
-if [[ ! -v "_archive_format" ]]; then
-  if [[ "${_git}" == "true" ]]; then
-    if [[ "${_evmfs}" == "true" ]]; then
-      _archive_format="bundle"
-    elif [[ "${_evmfs}" == "false" ]]; then
-      _archive_format="git"
-    fi
-  elif [[ "${_git}" == "false" ]]; then
-    _archive_format="tar.gz"
-  fi
-fi
 _pkg=solidity
 _0_8_30_commit="73712a01b2de56d9ad91e3b6936f85c90cb7de36"
 _bundle_commit="142aa62e6805505b6a06cbeeec530f5c8bf0bfdd"
@@ -280,6 +269,37 @@ else
       _commit="${_bundle_commit}"
     elif [[ "${_evmfs}" == "false" ]]; then
       _commit="${_0_8_30_1_commit}"
+    fi
+  fi
+fi
+if [[ "${_git}" == "false" ]]; then
+  if [[ "${_boost_oldest}" == "1.89" ]]; then
+    _tag="${_commit}"
+    _tag_name="commit"
+    _tarname="${_pkg}-${_tag}"
+  elif [[ "${_boost_oldest}" != "1.89" ]]; then
+    _tag="${pkgver}"
+    _tag_name="pkgver"
+    _tarname="${_pkg}_${_tag}"
+  fi
+elif [[ "${_git}" == "true" ]]; then
+  _tag="${_commit}"
+  _tag_name="commit"
+  _tarname="${_pkg}-${_tag}"
+fi
+if [[ ! -v "_archive_format" ]]; then
+  if [[ "${_git}" == "true" ]]; then
+    if [[ "${_evmfs}" == "true" ]]; then
+      _archive_format="bundle"
+    elif [[ "${_evmfs}" == "false" ]]; then
+      _archive_format="git"
+    fi
+  elif [[ "${_git}" == "false" ]]; then
+    _archive_format="tar.gz"
+    if [[ "${_git_service}" == "github" ]]; then
+      if [[ "${_tag_name}" == "commit" ]]; then
+        _archive_format="zip"
+      fi
     fi
   fi
 fi
@@ -368,21 +388,6 @@ optdepends=(
   "${_cvc4_optdepends[*]}"
   "${_z3_optdepends[*]}"
 )
-if [[ "${_git}" == "false" ]]; then
-  if [[ "${_boost_oldest}" == "1.89" ]]; then
-    _tag="${_commit}"
-    _tag_name="commit"
-    _tarname="${_pkg}-${_tag}"
-  elif [[ "${_boost_oldest}" != "1.89" ]]; then
-    _tag="${pkgver}"
-    _tag_name="pkgver"
-    _tarname="${_pkg}_${_tag}"
-  fi
-elif [[ "${_git}" == "true" ]]; then
-  _tag="${_commit}"
-  _tag_name="commit"
-  _tarname="${_pkg}-${_tag}"
-fi
 _0_8_30_1_tarname="${_pkg}-${_0_8_30_1_commit}"
 _tarfile="${_tarname}.${_archive_format}"
 _0_8_30_1_tarfile="${_0_8_30_1_tarname}.${_archive_format}"
@@ -390,8 +395,8 @@ _bundle_sum="77860b58f9d6c4a9a9cb1ceaae7ebe5d856f91f3ccd96f67d5ea6a019d79d1fb"
 _bundle_sig_sum="7f737e7a88fdb8e96b428974592def4bbdf5bf24656b12ac5af76084b7fca095"
 _0_8_30_1_sum="ee1e8be598e10ab639454e3cfe7cde53b6573afc297ce72a9cae12c569cd0051"
 _0_8_30_1_sig_sum="7c36822399acda42434958d07ab6fcfbff45a2f654bc06edeed046c362e9e186"
-_github_sum="SKIP"
-_github_sig_sum="SKIP"
+_github_sum="904cc200f28d055092f4a5808594c73509aefaca4d5d8964056e13aff9bf107c"
+_github_sig_sum="fc8b54a454f4c16ddf413a925a1f273af3fb25008710552c43233c0e6af38d64"
 _gitlab_sum="SKIP"
 _gitlab_sig_sum="SKIP"
 _github_release_sum="5e8d58dff551a18205e325c22f1a3b194058efbdc128853afd75d31b0568216d"
