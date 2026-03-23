@@ -248,7 +248,7 @@ pkgbase="${_pkg}"
 pkgname=(
   "${_pkg}"
 )
-pkgrel=63
+pkgrel=64
 pkgdesc="Smart contract programming language."
 arch=(
   "x86_64"
